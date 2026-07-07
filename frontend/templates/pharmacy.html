@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}Pharmacy | BloomCare Hospital{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="p-4 bg-white rounded-4 border border-1 d-flex flex-wrap align-items-center justify-content-between">
+            <div>
+                <span class="badge text-uppercase bg-danger text-white px-3 py-2 mb-2">Pharmacy Vault</span>
+                <h2 class="brand-font mb-1">Prescription Pharmacotherapy Vault</h2>
+                <p class="text-muted small mb-0">Browse details and dosage timings of clomiphene, folic acid, metformins, and tablets</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Search box -->
+<div class="row mb-4">
+    <div class="col-md-6 mx-auto">
+        <form method="get" class="d-flex gap-2">
+            <input type="text" name="q" value="{{ search_q }}" class="form-control" placeholder="Search medicines by name or patient...">
+            <button type="submit" class="btn btn-pink">Search</button>
+            {% if search_q %}
+                <a href="{% url 'pharmacy_page' %}" class="btn btn-outline-pink">Clear</a>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+<div class="card card-hospital p-4">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle small">
+            <thead>
+                <tr>
+                    <th>Date Prescribed</th>
+                    <th>Patient Name</th>
+                    <th>Medicine Name</th>
+                    <th>Clinical Purpose</th>
+                    <th>Dosages Schedule (M / A / N)</th>
+                    <th>Duration</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for med in medicines %}
+                <tr>
+                    <td>{{ med.prescribed_at|date:"M d, Y" }}</td>
+                    <td>{{ med.appointment.patient_name }}</td>
+                    <td class="fw-bold text-danger" style="color: var(--primary-pink-dark);">{{ med.medicine_name }}</td>
+                    <td>{{ med.purpose }}</td>
+                    <td>
+                        <span class="badge {% if med.dosage_morning %}bg-success{% else %}bg-light text-muted{% endif %}">M</span>
+                        <span class="badge {% if med.dosage_afternoon %}bg-success{% else %}bg-light text-muted{% endif %}">A</span>
+                        <span class="badge {% if med.dosage_night %}bg-success{% else %}bg-light text-muted{% endif %}">N</span>
+                    </td>
+                    <td>{{ med.duration }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-4 text-muted">No medicines matching search criteria.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

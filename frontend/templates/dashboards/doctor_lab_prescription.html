@@ -1,0 +1,66 @@
+{% extends 'dashboards/doctor_base.html' %}
+
+{% block doctor_content %}
+<h3 class="brand-font mb-2">Laboratory Services</h3>
+<h5 class="text-muted small mb-4">Patient: {{ appointment.patient_name }} ({{ appointment.age }})</h5>
+
+<div class="row">
+    <!-- Prescribe Lab Test Form -->
+    <div class="col-md-5 mb-4">
+        <div class="p-3 bg-light rounded-4 border">
+            <h5 class="brand-font mb-3"><i class="bi bi-prescription2"></i> Prescribe Test</h5>
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">Select Test Type</label>
+                    {{ form.test_name }}
+                </div>
+                <button type="submit" class="btn btn-pink w-100"><i class="bi bi-plus-circle"></i> Add Test</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Prescribed Tests & Upload Reports -->
+    <div class="col-md-7">
+        <div class="p-3 bg-white rounded-4 border">
+            <h5 class="brand-font mb-3"><i class="bi bi-file-earmark-medical"></i> Prescribed Tests</h5>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle small">
+                    <thead>
+                        <tr>
+                            <th>Test Name</th>
+                            <th>Status</th>
+                            <th>Upload Report (PDF)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for test in tests %}
+                        <tr>
+                            <td class="fw-bold">{{ test.test_name }}</td>
+                            <td>
+                                {% if test.status == 'Prescribed' %}
+                                    <span class="badge bg-secondary">Prescribed</span>
+                                {% else %}
+                                    <span class="badge bg-success">Uploaded</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <form action="{% url 'doctor_upload_lab_report' test.id %}" method="post" enctype="multipart/form-data" class="d-flex gap-1 align-items-center">
+                                    {% csrf_token %}
+                                    <input type="file" name="pdf_report" class="form-control form-control-sm" required>
+                                    <button type="submit" class="btn btn-sm btn-pink">Upload</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center py-3 text-muted">No laboratory tests prescribed yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

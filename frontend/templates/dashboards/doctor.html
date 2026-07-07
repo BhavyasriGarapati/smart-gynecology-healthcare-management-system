@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+{% block title %}Gynecologist Portal | BloomCare{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="p-4 bg-white rounded-4 border border-1 d-flex flex-wrap align-items-center justify-content-between">
+            <div>
+                <span class="badge text-uppercase tracking-wider px-3 py-2 mb-2 metric-badge metric-badge-teal">Specialist Portal</span>
+                <h2 class="brand-font mb-1">Welcome, Dr. {{ user.get_full_name }}</h2>
+                <p class="text-muted-custom small mb-0">Specialization: {{ user.doctor_profile.specialization }} • Room Chamber: {{ user.doctor_profile.hospital_location }}</p>
+            </div>
+            <div class="mt-3 mt-md-0 d-flex gap-2">
+                <a href="{% url 'upload_lab_report' %}" class="btn btn-wellness-teal"><i class="bi bi-cloud-upload"></i> Upload Diagnostic Report</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Search Bar & Filters -->
+<div class="row mb-4">
+    <div class="col-md-8 mx-auto">
+        <form method="get" class="d-flex gap-2">
+            <input type="text" name="q" value="{{ search_query }}" class="form-control" placeholder="Search patients by name, symptoms or reasons...">
+            <button type="submit" class="btn btn-wellness-teal"><i class="bi bi-search"></i> Search</button>
+            {% if search_query %}
+                <a href="{% url 'dashboard' %}" class="btn btn-wellness-outline">Clear</a>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Active Cases Column -->
+    <div class="col-lg-8 mb-4">
+        <div class="card card-wellness p-4 mb-4">
+            <h4 class="brand-font mb-3 text-teal" style="color: var(--accent-teal);"><i class="bi bi-heart-pulse-fill"></i> Active Patient Consultations</h4>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle small">
+                    <thead>
+                        <tr>
+                            <th>Patient Name</th>
+                            <th>Date / Slot</th>
+                            <th>Symptoms / Reason</th>
+                            <th>Status</th>
+                            <th>Action Controls</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for appt in active_cases %}
+                        <tr>
+                            <td>
+                                <div class="fw-bold">{{ appt.patient.get_full_name }}</div>
+                                <div class="text-muted small">DOB: {{ appt.patient.patient_profile.date_of_birth|default:"Not Logged" }}</div>
+                            </td>
+                            <td>
+                                <div>{{ appt.appointment_date|date:"M d, Y" }}</div>
+                                <span class="badge bg-light text-dark small mt-1">{{ appt.time_slot }}</span>
+                            </td>
+                            <td>
+                                <strong>Reason:</strong> {{ appt.reason_for_visit|truncatewords:6 }}
+                                {% if appt.selected_symptoms %}
+                                <br/><span class="small text-rose">Checked: {{ appt.selected_symptoms }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if appt.status == 'PENDING' %}
+                                    <span class="badge bg-secondary-subtle text-dark border-0 rounded-pill px-2">Pending</span>
+                                {% elif appt.status == 'CONFIRMED' %}
+                                    <span class="badge bg-primary-subtle text-primary border-0 rounded-pill px-2">Confirmed</span>
+                                {% elif appt.status == 'IN_PROGRESS' %}
+                                    <span class="badge bg-warning-subtle text-warning border-0 rounded-pill px-2">In Progress</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="d-flex flex-wrap gap-1">
+                                    {% if appt.status == 'PENDING' %}
+                                        <a href="{% url 'accept_appointment' appt.id %}" class="btn btn-sm btn-wellness-teal">Accept</a>
+                                        <a href="{% url 'cancel_appointment' appt.id %}" class="btn btn-sm btn-outline-danger border-0">Reject</a>
+                                    {% endif %}
+                                    
+                                    {% if appt.status == 'CONFIRMED' %}
+                                        <a href="{% url 'manage_medical_record' appt.id %}" class="btn btn-sm btn-wellness-rose">Manage EHR</a>
+                                        <a href="{% url 'complete_case' appt.id %}" class="btn btn-sm btn-success">Complete Case</a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-4 text-muted">No active patient bookings found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card card-wellness p-4">
+            <h4 class="brand-font mb-3 text-muted-custom"><i class="bi bi-check-circle-fill"></i> Completed Case Archives</h4>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle small">
+                    <thead>
+                        <tr>
+                            <th>Patient Name</th>
+                            <th>Date / Slot</th>
+                            <th>Treatment Summary</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for appt in completed_cases %}
+                        <tr>
+                            <td class="fw-semibold">{{ appt.patient.get_full_name }}</td>
+                            <td>{{ appt.appointment_date|date:"M d, Y" }}</td>
+                            <td>
+                                {% if appt.medical_record %}
+                                    {{ appt.medical_record.diagnosis|default:"No clinical diagnoses saved."|truncatewords:8 }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge bg-success-subtle text-success border-0 rounded-pill px-2">Case Completed</span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center py-4 text-muted">No completed cases found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart column -->
+    <div class="col-lg-4 mb-4">
+        <div class="card card-wellness p-4 h-100">
+            <h4 class="brand-font mb-3 text-center"><i class="bi bi-pie-chart-fill"></i> Status Metrics</h4>
+            <canvas id="doctorMetricsChart" style="max-height: 250px;"></canvas>
+            
+            <div class="mt-4 small border-top pt-3" style="border-top-color: var(--border-color) !important;">
+                <h6 class="fw-bold mb-2">Practice Guidelines:</h6>
+                <ul class="text-muted-custom mb-0 lh-lg">
+                    <li>Review incoming appointment requests daily.</li>
+                    <li>Update vitals & prescriptions under patient EHR record immediately following check-in.</li>
+                    <li>Mark cases as "Completed" post-consultation to close the invoice billing record.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const ctx = document.getElementById('doctorMetricsChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Pending', 'Confirmed', 'Completed'],
+                datasets: [{
+                    data: [
+                        {% for item in dept_chart_data %}
+                            {% if item.status == 'PENDING' %}{{ item.count }},{% endif %}
+                            {% if item.status == 'CONFIRMED' %}{{ item.count }},{% endif %}
+                            {% if item.status == 'COMPLETED' %}{{ item.count }},{% endif %}
+                        {% empty %}
+                            1, 2, 5
+                        {% endfor %}
+                    ],
+                    backgroundColor: ['#ECE5DE', '#789B8C', '#D9A08B'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

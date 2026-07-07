@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Patient Signup | BloomCare Hospital{% endblock %}
+
+{% block content %}
+<div class="row py-5">
+    <div class="col-md-5 mx-auto">
+        <div class="card card-hospital p-4 p-md-5">
+            <div class="text-center mb-4">
+                <span class="fs-2 brand-font"><i class="bi bi-heart-pulse-fill text-danger"></i> BloomCare</span>
+                <h4 class="mt-2 brand-font">Patient Registration</h4>
+                <p class="text-muted small">Sign up to access patient trackers and consult gynecologists</p>
+            </div>
+            
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">Full Name</label>
+                    {{ form.full_name }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">Gmail</label>
+                    {{ form.gmail }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">Password</label>
+                    {{ form.password }}
+                </div>
+                <div class="mb-4">
+                    <label class="form-label small fw-semibold">Confirm Password</label>
+                    {{ form.confirm_password }}
+                </div>
+                
+                <button type="submit" class="btn btn-pink w-100 py-3 mb-3"><i class="bi bi-person-plus-fill"></i> Register</button>
+            </form>
+            
+            <div class="text-center mt-3 border-top pt-3" style="border-top-color: var(--border-color) !important;">
+                <p class="small text-muted mb-0">Already registered? <a href="{% url 'patient_login' %}" class="fw-semibold text-rose" style="color: var(--primary-pink-dark);">Sign In here</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}Doctor Sign In | BloomCare Hospital{% endblock %}
+
+{% block content %}
+<div class="row py-5">
+    <div class="col-md-5 mx-auto">
+        <div class="card card-hospital p-4 p-md-5" style="border-top: 5px solid var(--primary-pink-dark);">
+            <div class="text-center mb-4">
+                <span class="fs-2 brand-font"><i class="bi bi-heart-pulse-fill text-danger"></i> BloomCare</span>
+                <h4 class="mt-2 brand-font">Doctor Login</h4>
+                <p class="text-muted small">Verify coordinates to log in to the gynecologist workspace</p>
+            </div>
+            
+            <form method="post" action="{% url 'doctor_login' %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">Doctor Name</label>
+                    <input type="text" name="doctor_name" class="form-control" placeholder="Enter Doctor Name" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">Department Mapping</label>
+                    <select name="department" class="form-select" required>
+                        {% for code, label in departments %}
+                            <option value="{{ code }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">Specialization</label>
+                    <input type="text" name="specialization" class="form-control" placeholder="e.g. General Gynecology" required>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label small fw-semibold">Password</label>
+                    <input type="password" name="password" class="form-control" placeholder="Enter Password" required>
+                </div>
+                
+                <button type="submit" class="btn btn-pink w-100 py-3 mb-3"><i class="bi bi-shield-lock-fill"></i> Login</button>
+            </form>
+            
+            <div class="text-center mt-3 border-top pt-3" style="border-top-color: var(--border-color) !important;">
+                <p class="small text-muted mb-0">New Doctor? <a href="{% url 'doctor_register' %}" class="fw-semibold text-rose" style="color: var(--primary-pink-dark);">Register Doctor Profile</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

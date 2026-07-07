@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Book Consultation Slot | BloomCare{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-7 mx-auto">
+        <div class="card card-wellness p-4 p-md-5">
+            <h3 class="brand-font mb-2"><i class="bi bi-calendar-plus text-rose" style="color: var(--primary-rose);"></i> Book Gynecological Consultation</h3>
+            <p class="text-muted-custom small mb-4">Request a consultation slot. Our staff will coordinate scheduling details upon checking patient queues.</p>
+            
+            <form method="post" action="{% url 'book_appointment' %}">
+                {% csrf_token %}
+                
+                {% if form.patient %}
+                <div class="mb-3">
+                    <label for="id_patient" class="form-label small fw-semibold">Patient Account</label>
+                    {{ form.patient }}
+                </div>
+                {% endif %}
+                
+                <div class="mb-3">
+                    <label for="id_doctor" class="form-label small fw-semibold">Select Gynecologist</label>
+                    {{ form.doctor }}
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="id_appointment_date" class="form-label small fw-semibold">Appointment Date</label>
+                        {{ form.appointment_date }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="id_time_slot" class="form-label small fw-semibold">Time Slot</label>
+                        {{ form.time_slot }}
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="id_reason_for_visit" class="form-label small fw-semibold">Reason for Visit / Main Symptoms</label>
+                    {{ form.reason_for_visit }}
+                </div>
+                
+                <button type="submit" class="btn btn-wellness-rose w-100 py-3"><i class="bi bi-calendar-check"></i> Book Consultation Slot</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

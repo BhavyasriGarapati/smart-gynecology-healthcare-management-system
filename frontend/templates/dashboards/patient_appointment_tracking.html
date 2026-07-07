@@ -1,0 +1,47 @@
+{% extends 'dashboards/patient_base.html' %}
+
+{% block patient_content %}
+<h3 class="brand-font mb-3"><i class="bi bi-clock-history"></i> Appointment Tracking</h3>
+<p class="text-muted small">Monitor status states of requested doctor consults.</p>
+
+<div class="table-responsive">
+    <table class="table table-hover align-middle small">
+        <thead>
+            <tr>
+                <th>Appt Number</th>
+                <th>Doctor Name</th>
+                <th>Appointment Date</th>
+                <th>Time Slot</th>
+                <th>Current Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for appt in appointments %}
+            <tr>
+                <td class="fw-bold">{{ appt.appointment_number }}</td>
+                <td class="fw-semibold">Dr. {{ appt.doctor.user.username }}</td>
+                <td>{{ appt.appointment_date|date:"F d, Y" }}</td>
+                <td><span class="badge bg-light text-dark">{{ appt.time_slot }}</span></td>
+                <td>
+                    {% if appt.status == 'Pending' %}
+                        <span class="badge bg-secondary text-white px-2 py-1">Pending</span>
+                    {% elif appt.status == 'Accepted' %}
+                        <span class="badge bg-primary text-white px-2 py-1">Accepted</span>
+                    {% elif appt.status == 'In Progress' %}
+                        <span class="badge bg-warning text-dark px-2 py-1">In Progress</span>
+                    {% elif appt.status == 'Completed' %}
+                        <span class="badge bg-success text-white px-2 py-1">Completed</span>
+                    {% else %}
+                        <span class="badge bg-danger text-white px-2 py-1">Cancelled</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center py-4 text-muted">No appointments requested yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %}Doctor Detail Records | BloomCare Hospital{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="brand-font mb-0"><i class="bi bi-person-workspace"></i> Specialist Profile: Dr. {{ doctor.user.username }}</h2>
+    <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-pink btn-sm"><i class="bi bi-arrow-left"></i> Back to Console</a>
+</div>
+
+<div class="row mb-4 g-3">
+    <div class="col-md-4">
+        <div class="card card-hospital p-3 text-center h-100">
+            {% if doctor.profile_photo %}
+                <img src="{{ doctor.profile_photo.url }}" class="rounded-circle mb-3 mx-auto shadow-sm" style="width: 100px; height: 100px; object-fit: cover; border: 3px solid var(--primary-rose);">
+            {% else %}
+                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mb-3 mx-auto" style="width: 100px; height: 100px; background-color: var(--primary-rose-light) !important; border: 3px solid var(--primary-rose);">
+                    <i class="bi bi-person-fill fs-1" style="color: var(--primary-rose);"></i>
+                </div>
+            {% endif %}
+            <h5 class="brand-font mb-1">Dr. {{ doctor.user.username }}</h5>
+            <p class="small text-muted mb-0">{{ doctor.qualification }}</p>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card card-hospital p-3 h-100">
+            <h5 class="brand-font mb-3">Clinical Profile Details</h5>
+            <div class="row small">
+                <div class="col-6 mb-2"><strong>Specialization:</strong> {{ doctor.specialization }}</div>
+                <div class="col-6 mb-2"><strong>Department:</strong> {{ doctor.department }}</div>
+                <div class="col-6 mb-2"><strong>Experience:</strong> {{ doctor.experience }} Years</div>
+                <div class="col-6 mb-2"><strong>Base Fees:</strong> ₹{{ doctor.consultation_fee }}</div>
+                <div class="col-6 mb-2"><strong>Working Days:</strong> {{ doctor.working_days }}</div>
+                <div class="col-6 mb-2"><strong>Work Hours:</strong> {{ doctor.work_timings }}</div>
+                <div class="col-12 mt-2"><strong>Hospital Name:</strong> {{ doctor.hospital_name }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Appointments history -->
+<div class="card card-hospital p-4">
+    <h5 class="brand-font mb-3">Consultations Handled</h5>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle small">
+            <thead>
+                <tr>
+                    <th>Appt No</th>
+                    <th>Patient Name (Age)</th>
+                    <th>Date / Slot</th>
+                    <th>Symptom Category</th>
+                    <th>Current Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for appt in appointments %}
+                <tr>
+                    <td class="fw-bold">{{ appt.appointment_number }}</td>
+                    <td>{{ appt.patient_name }} ({{ appt.age }})</td>
+                    <td>{{ appt.appointment_date }} <br/><small class="text-muted">{{ appt.time_slot }}</small></td>
+                    <td><span class="badge bg-light text-dark">{{ appt.selected_symptom }}</span></td>
+                    <td>{{ appt.status }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center py-3 text-muted">No consultations handled yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

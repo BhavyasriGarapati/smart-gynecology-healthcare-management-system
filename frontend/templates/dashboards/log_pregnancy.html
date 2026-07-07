@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Log Pregnancy Progress | BloomCare{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card card-wellness p-4 p-md-5">
+            <h3 class="brand-font mb-2"><i class="bi bi-heart-pulse-fill text-rose" style="color: var(--primary-rose);"></i> Smart Pregnancy Log</h3>
+            <p class="text-muted-custom small mb-4">Input your Last Menstrual Period (LMP) date. The system will automatically run calculations to estimate your due date (EDD), define week progress, and chart weekly development landmarks.</p>
+            
+            <form method="post" action="{% url 'log_pregnancy' %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="id_last_menstrual_period" class="form-label small fw-semibold">Last Menstrual Period (LMP) Date</label>
+                    {{ form.last_menstrual_period }}
+                </div>
+                <div class="mb-4">
+                    <label for="id_notes" class="form-label small fw-semibold">Prenatal Notes / Observations</label>
+                    {{ form.notes }}
+                </div>
+                
+                <!-- Placeholder for live prediction preview -->
+                <div id="pregnancy-live-preview"></div>
+                
+                <button type="submit" class="btn btn-wellness-rose w-100 py-3 mt-3"><i class="bi bi-save"></i> Save Log & Calculate</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,139 @@
+{% extends 'dashboards/doctor_base.html' %}
+
+{% block doctor_content %}
+<span class="badge bg-light text-danger border px-3 py-2 mb-2" style="color: var(--primary-pink-dark); border-color: var(--border-color) !important;">Doctor Workspace</span>
+<h2 class="brand-font mb-4">Gynecologist Case Manager</h2>
+
+<!-- 1. Today's Appointments -->
+<div class="card card-hospital p-3 mb-4">
+    <h4 class="brand-font mb-3 text-rose" style="color: var(--primary-pink-dark);"><i class="bi bi-calendar2-day-fill"></i> Today's Appointments</h4>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle small">
+            <thead>
+                <tr>
+                    <th>Patient (Age/BG/H/W)</th>
+                    <th>Symptoms</th>
+                    <th>Time Slot</th>
+                    <th>Doctor Notes</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for appt in today_appointments %}
+                <tr>
+                    <td>
+                        <div class="fw-bold">{{ appt.patient_name }}</div>
+                        <div class="text-muted small">Age: {{ appt.age }} | BG: {{ appt.blood_group }} | Height: {{ appt.height }} | Weight: {{ appt.weight }}</div>
+                    </td>
+                    <td><span class="badge bg-light text-danger border">{{ appt.selected_symptom }}</span></td>
+                    <td><span class="badge bg-secondary text-white">{{ appt.time_slot }}</span></td>
+                    <td>{{ appt.doctor_notes|default:"-" }}</td>
+                    <td>
+                        <div class="d-flex gap-1">
+                            {% if appt.status == 'Pending' %}
+                                <a href="{% url 'doctor_appointments_status' appt.id 'Accepted' %}" class="btn btn-sm btn-pink">Accept</a>
+                                <a href="{% url 'doctor_appointments_status' appt.id 'Cancelled' %}" class="btn btn-sm btn-outline-danger border-0">Reject</a>
+                            {% elif appt.status == 'Accepted' %}
+                                <a href="{% url 'doctor_appointments_status' appt.id 'In Progress' %}" class="btn btn-sm btn-warning">In Progress</a>
+                            {% elif appt.status == 'In Progress' %}
+                                <a href="{% url 'doctor_appointments_status' appt.id 'Completed' %}" class="btn btn-sm btn-success">Complete Case</a>
+                            {% else %}
+                                <span class="badge bg-light text-muted">{{ appt.status }}</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center py-3 text-muted">No appointments scheduled today.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- 2. Pending Cases -->
+<div class="card card-hospital p-3 mb-4">
+    <h4 class="brand-font mb-3 text-rose" style="color: var(--primary-pink-dark);"><i class="bi bi-clock-history"></i> Pending & Active Cases</h4>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle small">
+            <thead>
+                <tr>
+                    <th>Appointment No</th>
+                    <th>Patient Name (Age)</th>
+                    <th>Vitals (BG/H/W)</th>
+                    <th>Symptom</th>
+                    <th>Date / Slot</th>
+                    <th>Status</th>
+                    <th>Worksheets</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for appt in pending_cases %}
+                <tr>
+                    <td class="fw-bold">{{ appt.appointment_number }}</td>
+                    <td>{{ appt.patient_name }} ({{ appt.age }})</td>
+                    <td>BG: {{ appt.blood_group }} | Height: {{ appt.height }} | Weight: {{ appt.weight }}</td>
+                    <td><span class="badge bg-light text-danger border">{{ appt.selected_symptom }}</span></td>
+                    <td>{{ appt.appointment_date|date:"M d, Y" }} <br/><small class="text-muted">{{ appt.time_slot }}</small></td>
+                    <td>
+                        {% if appt.status == 'Pending' %}
+                            <span class="badge bg-secondary">Pending</span>
+                        {% elif appt.status == 'Accepted' %}
+                            <span class="badge bg-primary">Accepted</span>
+                        {% elif appt.status == 'In Progress' %}
+                            <span class="badge bg-warning text-dark">In Progress</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="btn-group gap-1">
+                            <a href="{% url 'doctor_medical_notes' appt.id %}" class="btn btn-sm btn-wellness-outline py-1" style="border-radius: 4px; padding: 4px 8px; border: 1px solid var(--primary-pink-dark); color: var(--primary-pink-dark); text-decoration: none;">Notes</a>
+                            <a href="{% url 'doctor_lab_prescription' appt.id %}" class="btn btn-sm btn-wellness-outline py-1" style="border-radius: 4px; padding: 4px 8px; border: 1px solid var(--primary-pink-dark); color: var(--primary-pink-dark); text-decoration: none;">Lab</a>
+                            <a href="{% url 'doctor_prescription' appt.id %}" class="btn btn-sm btn-wellness-outline py-1" style="border-radius: 4px; padding: 4px 8px; border: 1px solid var(--primary-pink-dark); color: var(--primary-pink-dark); text-decoration: none;">Rx</a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-3 text-muted">No pending cases.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- 3. Completed Cases -->
+<div class="card card-hospital p-3">
+    <h4 class="brand-font mb-3 text-muted"><i class="bi bi-check-circle-fill"></i> Completed Cases Archive</h4>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle small">
+            <thead>
+                <tr>
+                    <th>Appt No</th>
+                    <th>Patient Name</th>
+                    <th>Age</th>
+                    <th>Diagnosis Notes</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for appt in completed_cases %}
+                <tr>
+                    <td class="fw-bold">{{ appt.appointment_number }}</td>
+                    <td>{{ appt.patient_name }}</td>
+                    <td>{{ appt.age }}</td>
+                    <td>{{ appt.doctor_notes|default:"No clinical notes entered." }}</td>
+                    <td><span class="badge bg-success">Completed</span></td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center py-3 text-muted">No cases completed yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

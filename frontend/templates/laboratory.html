@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}Laboratory | BloomCare Hospital{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="p-4 bg-white rounded-4 border border-1 d-flex flex-wrap align-items-center justify-content-between">
+            <div>
+                <span class="badge text-uppercase bg-danger text-white px-3 py-2 mb-2">Lab Services</span>
+                <h2 class="brand-font mb-1">Clinical Laboratory Registry</h2>
+                <p class="text-muted small mb-0">Search and check status records of diagnostic blood tests, urine tests, and pregnancy scans</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Search box -->
+<div class="row mb-4">
+    <div class="col-md-6 mx-auto">
+        <form method="get" class="d-flex gap-2">
+            <input type="text" name="q" value="{{ search_q }}" class="form-control" placeholder="Search tests by name or patient...">
+            <button type="submit" class="btn btn-pink">Search</button>
+            {% if search_q %}
+                <a href="{% url 'laboratory_page' %}" class="btn btn-outline-pink">Clear</a>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+<div class="card card-hospital p-4">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle small">
+            <thead>
+                <tr>
+                    <th>Date Prescribed</th>
+                    <th>Test Name</th>
+                    <th>Patient Name (Age)</th>
+                    <th>Consultant</th>
+                    <th>Report Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for test in tests %}
+                <tr>
+                    <td>{{ test.prescribed_at|date:"M d, Y" }}</td>
+                    <td class="fw-bold text-danger" style="color: var(--primary-pink-dark);">{{ test.test_name }}</td>
+                    <td>{{ test.appointment.patient_name }} ({{ test.appointment.age }})</td>
+                    <td>Dr. {{ test.appointment.doctor.user.username }}</td>
+                    <td>
+                        {% if test.pdf_report %}
+                            <a href="{{ test.pdf_report.url }}" target="_blank" class="btn btn-sm btn-pink"><i class="bi bi-download"></i> Download PDF Report</a>
+                        {% else %}
+                            <span class="badge bg-light text-muted">Pending Upload</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center py-4 text-muted">No laboratory tests matching search criteria.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

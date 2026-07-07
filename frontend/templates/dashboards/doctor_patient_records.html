@@ -1,0 +1,37 @@
+{% extends 'dashboards/doctor_base.html' %}
+
+{% block doctor_content %}
+<h3 class="brand-font mb-3"><i class="bi bi-journal-medical"></i> Patient Medical Records</h3>
+<p class="text-muted small">Review clinical logs and details of patient visits.</p>
+
+<div class="table-responsive">
+    <table class="table table-hover align-middle small">
+        <thead>
+            <tr>
+                <th>Appt Number</th>
+                <th>Patient Name</th>
+                <th>Vitals (H/W/BG)</th>
+                <th>Symptom</th>
+                <th>Date Logged</th>
+                <th>Clinical Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for appt in appointments %}
+            <tr>
+                <td class="fw-bold">{{ appt.appointment_number }}</td>
+                <td>{{ appt.patient_name }} ({{ appt.age }})</td>
+                <td>Height: {{ appt.height }} | Weight: {{ appt.weight }} | BG: {{ appt.blood_group }}</td>
+                <td><span class="badge bg-light text-danger border">{{ appt.selected_symptom }}</span></td>
+                <td>{{ appt.appointment_date }}</td>
+                <td>{{ appt.doctor_notes|default:"-" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center py-4 text-muted">No patient records available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

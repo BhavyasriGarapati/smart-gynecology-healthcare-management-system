@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+{% block title %}Administrator Dashboard | BloomCare Hospital{% endblock %}
+
+{% block content %}
+<div class="row mb-4 no-print">
+    <div class="col-12">
+        <div class="p-4 bg-white rounded-4 border border-1 d-flex flex-wrap align-items-center justify-content-between">
+            <div>
+                <span class="badge text-uppercase tracking-wider bg-danger text-white px-3 py-2 mb-2">Hospital Console</span>
+                <h2 class="brand-font mb-1">Administrative Directory Control</h2>
+                <p class="text-muted small mb-0">Review system patient databases, registered specialists, appointments, and e-reports</p>
+            </div>
+            <div>
+                <a href="/django-admin/" target="_blank" class="btn btn-pink"><i class="bi bi-shield-lock-fill"></i> Database Admin Control</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Search Controls -->
+<div class="row mb-4 no-print">
+    <div class="col-md-6 mx-auto">
+        <form method="get" class="d-flex gap-2">
+            <input type="text" name="q" value="{{ search_q }}" class="form-control" placeholder="Search patients, doctors or appointments...">
+            <button type="submit" class="btn btn-pink">Search</button>
+            {% if search_q %}
+                <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-pink">Clear</a>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+<!-- 1. All Patients Table -->
+<div class="card card-hospital p-4 mb-4">
+    <h4 class="brand-font mb-3"><i class="bi bi-people-fill text-rose" style="color: var(--primary-pink-dark);"></i> Registered Patient Profiles</h4>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle small">
+            <thead>
+                <tr>
+                    <th>Patient Name (Username)</th>
+                    <th>Email Address (Gmail)</th>
+                    <th>Role Setting</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pat in patients %}
+                <tr>
+                    <td class="fw-bold">{{ pat.user.username }}</td>
+                    <td>{{ pat.gmail }}</td>
+                    <td><span class="badge bg-danger-subtle text-danger">Patient</span></td>
+                    <td>
+                        <a href="{% url 'admin_patient_detail' pat.user.id %}" class="btn btn-sm btn-pink">View Records</a>
+                        <a href="{% url 'admin_delete_user' pat.user.id %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this patient profile?');">Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center py-3 text-muted">No patients found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- 2. All Doctors Table -->
+<div class="card card-hospital p-4 mb-4">
+    <h4 class="brand-font mb-3"><i class="bi bi-heart-pulse-fill text-rose" style="color: var(--primary-pink-dark);"></i> Hospital Specialists (Gynecologists)</h4>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle small">
+            <thead>
+                <tr>
+                    <th>Doctor Name</th>
+                    <th>Age</th>
+                    <th>Gmail</th>
+                    <th>Specialization / Qualification</th>
+                    <th>Department</th>
+                    <th>Fees / Hours</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for doc in doctors %}
+                <tr>
+                    <td class="fw-bold">Dr. {{ doc.user.username }}</td>
+                    <td>{{ doc.age }} Yrs</td>
+                    <td>{{ doc.user.email }}</td>
+                    <td>{{ doc.specialization }} ({{ doc.qualification }})</td>
+                    <td><span class="badge bg-light text-danger border">{{ doc.department }}</span></td>
+                    <td>₹{{ doc.consultation_fee }} <br/><small class="text-muted">{{ doc.work_timings }}</small></td>
+                    <td>
+                        <a href="{% url 'admin_doctor_detail' doc.id %}" class="btn btn-sm btn-pink">View Profile</a>
+                        <a href="{% url 'admin_delete_user' doc.user.id %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete doctor account?');">Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-3 text-muted">No specialists found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- 3. All Appointments Table -->
+<div class="card card-hospital p-4 mb-4">
+    <h4 class="brand-font mb-3"><i class="bi bi-calendar-check-fill text-rose" style="color: var(--primary-pink-dark);"></i> Consultations Registry</h4>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle small">
+            <thead>
+                <tr>
+                    <th>Appt No</th>
+                    <th>Patient Name (Age/BG/H/W)</th>
+                    <th>Symptom</th>
+                    <th>Consulting Doctor</th>
+                    <th>Date / Slot</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for appt in appointments %}
+                <tr>
+                    <td class="fw-bold">{{ appt.appointment_number }}</td>
+                    <td>
+                        <strong>{{ appt.patient_name }}</strong>
+                        <div class="text-muted small">Age: {{ appt.age }} | BG: {{ appt.blood_group }} | Height: {{ appt.height }} | Weight: {{ appt.weight }}</div>
+                    </td>
+                    <td><span class="badge bg-light text-dark">{{ appt.selected_symptom }}</span></td>
+                    <td>Dr. {{ appt.doctor.user.username }}</td>
+                    <td>{{ appt.appointment_date }} <br/><small class="text-muted">{{ appt.time_slot }}</small></td>
+                    <td>
+                        {% if appt.status == 'Pending' %}
+                            <span class="badge bg-secondary">Pending</span>
+                        {% elif appt.status == 'Accepted' %}
+                            <span class="badge bg-primary">Accepted</span>
+                        {% elif appt.status == 'In Progress' %}
+                            <span class="badge bg-warning text-dark">In Progress</span>
+                        {% elif appt.status == 'Completed' %}
+                            <span class="badge bg-success">Completed</span>
+                        {% else %}
+                            <span class="badge bg-danger">Cancelled</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'admin_delete_appointment' appt.id %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete appointment?');">Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-3 text-muted">No appointments found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

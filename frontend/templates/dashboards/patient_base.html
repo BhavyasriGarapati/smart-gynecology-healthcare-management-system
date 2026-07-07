@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <!-- Left Column: Patient Navigation Sidebar -->
+    <div class="col-md-3 mb-4">
+        <div class="sidebar-wellness">
+            <h5 class="brand-font mb-4 text-center"><i class="bi bi-person-heart"></i> Patient Portal</h5>
+            
+            <a href="{% url 'patient_dashboard' %}" class="sidebar-link {% if request.resolver_match.url_name == 'patient_dashboard' %}active{% endif %}">
+                <i class="bi bi-house-door-fill me-2"></i> Dashboard
+            </a>
+            <a href="{% url 'patient_profile' %}" class="sidebar-link {% if request.resolver_match.url_name == 'patient_profile' %}active{% endif %}">
+                <i class="bi bi-person-fill me-2"></i> Profile
+            </a>
+            <a href="{% url 'patient_symptom_checker' %}" class="sidebar-link {% if request.resolver_match.url_name == 'patient_symptom_checker' %}active{% endif %}">
+                <i class="bi bi-shield-check me-2"></i> Symptom Checker
+            </a>
+            <a href="{% url 'patient_doctor_recommendation' %}" class="sidebar-link {% if request.resolver_match.url_name == 'patient_recommendation' %}active{% endif %}">
+                <i class="bi bi-people-fill me-2"></i> Doctor Recommendation
+            </a>
+            <a href="{% url 'patient_book_appointment' %}" class="sidebar-link {% if request.resolver_match.url_name == 'patient_book_appointment' %}active{% endif %}">
+                <i class="bi bi-calendar-plus-fill me-2"></i> Book Appointment
+            </a>
+            <a href="{% url 'patient_appointment_tracking' %}" class="sidebar-link {% if request.resolver_match.url_name == 'patient_appointment_tracking' %}active{% endif %}">
+                <i class="bi bi-clock-history me-2"></i> Appointment Tracking
+            </a>
+            
+            <hr class="my-3" style="border-color: var(--border-color);">
+            
+            <form action="{% url 'logout' %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-pink w-100"><i class="bi bi-box-arrow-right"></i> Logout</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Right Column: Dashboard Content -->
+    <div class="col-md-9">
+        <div class="card card-hospital p-4">
+            {% block patient_content %}
+            {% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock %}

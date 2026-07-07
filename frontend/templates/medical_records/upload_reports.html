@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Upload Diagnostic Reports | BloomCare{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-7 mx-auto">
+        <div class="card card-wellness p-4 p-md-5">
+            <h3 class="brand-font mb-2"><i class="bi bi-cloud-arrow-up text-teal" style="color: var(--accent-teal);"></i> Upload Laboratory or Ultrasound Report</h3>
+            <p class="text-muted-custom small mb-4">Attach lab analysis files or ultrasound scan documents (PDF/images) to secure under the patient's EHR vault. Only authorized staff and the patient can view files.</p>
+            
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="id_patient" class="form-label small fw-semibold">Select Patient</label>
+                    {{ form.patient }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_report_type" class="form-label small fw-semibold">Report Category</label>
+                    {{ form.report_type }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_title" class="form-label small fw-semibold">Report Title (e.g. 12-Week Pelvic Scan)</label>
+                    {{ form.title }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_file" class="form-label small fw-semibold">Select Scan File / PDF</label>
+                    {{ form.file }}
+                </div>
+                <div class="mb-4">
+                    <label for="id_doctor_notes" class="form-label small fw-semibold">Interpretation / Initial Notes</label>
+                    {{ form.doctor_notes }}
+                </div>
+                
+                <button type="submit" class="btn btn-wellness-teal w-100 py-3"><i class="bi bi-cloud-check-fill"></i> Upload and Secure File</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

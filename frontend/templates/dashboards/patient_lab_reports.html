@@ -1,0 +1,41 @@
+{% extends 'dashboards/patient_base.html' %}
+
+{% block patient_content %}
+<h3 class="brand-font mb-3"><i class="bi bi-file-earmark-medical"></i> Laboratory Reports</h3>
+<p class="text-muted small">Access and download files of prescribed diagnostic tests.</p>
+
+<div class="table-responsive">
+    <table class="table table-hover align-middle small">
+        <thead>
+            <tr>
+                <th>Date Prescribed</th>
+                <th>Test Name</th>
+                <th>Appt Number</th>
+                <th>Doctor</th>
+                <th>Report File</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for report in reports %}
+            <tr>
+                <td>{{ report.prescribed_at|date:"M d, Y" }}</td>
+                <td class="fw-bold text-danger" style="color: var(--primary-pink-dark);">{{ report.test_name }}</td>
+                <td>{{ report.appointment.appointment_number }}</td>
+                <td>Dr. {{ report.appointment.doctor.user.username }}</td>
+                <td>
+                    {% if report.pdf_report %}
+                        <a href="{{ report.pdf_report.url }}" target="_blank" class="btn btn-sm btn-pink"><i class="bi bi-download"></i> Download PDF</a>
+                    {% else %}
+                        <span class="text-muted small italic">Pending Upload</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center py-4 text-muted">No laboratory tests recorded yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

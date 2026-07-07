@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard | BloomCare{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="p-4 bg-white rounded-4 border border-1 d-flex flex-wrap align-items-center justify-content-between">
+            <div>
+                <span class="badge text-uppercase tracking-wider px-3 py-2 mb-2 metric-badge metric-badge-rose">System Administration</span>
+                <h2 class="brand-font mb-1">Administrative Analytics</h2>
+                <p class="text-muted-custom small mb-0">System metrics, configuration panels, staff logs, and billing reports</p>
+            </div>
+            <div class="mt-3 mt-md-0 d-flex gap-2">
+                <a href="/django-admin/" target="_blank" class="btn btn-wellness-teal"><i class="bi bi-shield-lock-fill"></i> Database Admin Control</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats row -->
+<div class="row mb-5">
+    <div class="col-md-3 mb-4">
+        <div class="card card-wellness p-4 border-start border-4 border-rose" style="border-left-color: var(--primary-rose) !important;">
+            <p class="text-muted-custom small mb-1 fw-semibold">Active Patients</p>
+            <h2 class="brand-font mb-0">{{ total_patients }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card card-wellness p-4 border-start border-4 border-teal" style="border-left-color: var(--accent-teal) !important;">
+            <p class="text-muted-custom small mb-1 fw-semibold">Gynecologists</p>
+            <h2 class="brand-font mb-0">{{ total_doctors }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card card-wellness p-4 border-start border-4 border-lavender" style="border-left-color: var(--accent-lavender) !important;">
+            <p class="text-muted-custom small mb-1 fw-semibold">Appointments</p>
+            <h2 class="brand-font mb-0">{{ total_appointments }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card card-wellness p-4 border-start border-4 border-success">
+            <p class="text-muted-custom small mb-1 fw-semibold">Total Revenue</p>
+            <h2 class="brand-font mb-0">₹{{ total_revenue }}</h2>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row mb-5">
+    <div class="col-md-6 mb-4">
+        <div class="card card-wellness p-4 h-100">
+            <h4 class="brand-font mb-3"><i class="bi bi-bar-chart-fill text-rose" style="color: var(--primary-rose);"></i> Appointments by Status</h4>
+            <canvas id="appointmentsChart" style="max-height: 250px;"></canvas>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card card-wellness p-4 h-100">
+            <h4 class="brand-font mb-3"><i class="bi bi-graph-up text-teal" style="color: var(--accent-teal);"></i> Revenue Progression (INR)</h4>
+            <canvas id="revenueChart" style="max-height: 250px;"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- All System Users -->
+<div class="row">
+    <div class="col-12">
+        <div class="card card-wellness p-4">
+            <h4 class="brand-font mb-3"><i class="bi bi-people-fill text-rose" style="color: var(--primary-rose);"></i> Platform User Database</h4>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle small">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>System Role</th>
+                            <th>Date Joined</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in users %}
+                        <tr>
+                            <td class="fw-bold">{{ u.username }}</td>
+                            <td>{{ u.get_full_name }}</td>
+                            <td>{{ u.email }}</td>
+                            <td>{{ u.phone_number|default:"-" }}</td>
+                            <td>
+                                {% if u.role == 'DOCTOR' %}
+                                    <span class="badge bg-primary-subtle text-primary border-0 rounded-pill px-2">Gynecologist</span>
+                                {% elif u.role == 'ADMIN' %}
+                                    <span class="badge bg-danger-subtle text-danger border-0 rounded-pill px-2">Admin</span>
+                                {% else %}
+                                    <span class="badge bg-secondary-subtle text-dark border-0 rounded-pill px-2">Patient</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ u.date_joined|date:"M d, Y" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted">No users registered yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Appointments status chart
+        const apptCtx = document.getElementById('appointmentsChart').getContext('2d');
+        new Chart(apptCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Pending', 'Confirmed', 'Completed', 'Cancelled'],
+                datasets: [{
+                    label: 'Appointments count',
+                    data: [
+                        {% for item in appts_by_status %}
+                            {% if item.status == 'PENDING' %}{{ item.count }},{% endif %}
+                            {% if item.status == 'CONFIRMED' %}{{ item.count }},{% endif %}
+                            {% if item.status == 'COMPLETED' %}{{ item.count }},{% endif %}
+                            {% if item.status == 'CANCELLED' %}{{ item.count }},{% endif %}
+                        {% empty %}
+                            2, 4, 8, 1
+                        {% endfor %}
+                    ],
+                    backgroundColor: ['#ECE5DE', '#789B8C', '#D9A08B', '#F4EAE6'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+
+        // Revenue Chart
+        const revCtx = document.getElementById('revenueChart').getContext('2d');
+        new Chart(revCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Monthly Earnings (INR)',
+                    data: [15000, 22000, 18000, 31000, 42000, {{ total_revenue }}],
+                    borderColor: '#789B8C',
+                    backgroundColor: 'rgba(120, 155, 140, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+    });
+</script>
+{% endblock %}

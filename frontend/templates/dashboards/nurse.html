@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block title %}Nurse Dashboard | BloomCare{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="p-4 bg-white rounded-4 border border-1 d-flex flex-wrap align-items-center justify-content-between">
+            <div>
+                <span class="badge text-uppercase tracking-wider px-3 py-2 mb-2 metric-badge metric-badge-teal">Nurse Portal</span>
+                <h2 class="brand-font mb-1">Clinical Nurse Workstation</h2>
+                <p class="text-muted-custom small mb-0">Record vital signs, coordinate today's consultation queues, and check-in patient arrivals</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Today's Schedule for check-ins and vitals -->
+    <div class="col-md-7 mb-4">
+        <div class="card card-wellness p-4">
+            <h4 class="brand-font mb-3"><i class="bi bi-clock-fill text-teal" style="color: var(--accent-teal);"></i> Today's Patient Queue</h4>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle small">
+                    <thead>
+                        <tr>
+                            <th>Patient Name</th>
+                            <th>Time Slot</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for appt in appointments %}
+                        <tr>
+                            <td class="fw-semibold">{{ appt.patient.get_full_name }}</td>
+                            <td><span class="badge bg-light text-dark">{{ appt.time_slot }}</span></td>
+                            <td>
+                                {% if appt.status == 'SCHEDULED' %}
+                                    <span class="badge bg-primary-subtle text-primary border-0 rounded-pill px-2">Scheduled</span>
+                                {% elif appt.status == 'CHECKED_IN' %}
+                                    <span class="badge bg-warning-subtle text-warning border-0 rounded-pill px-2">Checked In</span>
+                                {% elif appt.status == 'COMPLETED' %}
+                                    <span class="badge bg-success-subtle text-success border-0 rounded-pill px-2">Completed</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group gap-1">
+                                    {% if appt.status == 'SCHEDULED' %}
+                                        <a href="{% url 'update_appointment_status' appt.id 'CHECKED_IN' %}" class="btn btn-sm btn-wellness-teal">Check In</a>
+                                    {% endif %}
+                                    
+                                    {% if appt.status == 'CHECKED_IN' %}
+                                        <a href="{% url 'manage_medical_record' appt.id %}" class="btn btn-sm btn-wellness-rose"><i class="bi bi-heart-pulse"></i> Record Vitals</a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center py-4 text-muted">No patient queues scheduled today.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Vitals logged -->
+    <div class="col-md-5 mb-4">
+        <div class="card card-wellness p-4">
+            <h4 class="brand-font mb-3"><i class="bi bi-journals text-rose" style="color: var(--primary-rose);"></i> Recent Clinical Records</h4>
+            <div class="list-group list-group-flush small">
+                {% for rec in recent_records %}
+                <div class="list-group-item bg-transparent py-3 border-bottom">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="fw-bold">{{ rec.patient.get_full_name }}</span>
+                        <span class="text-muted-custom small">{{ rec.visit_date|date:"M d, Y" }}</span>
+                    </div>
+                    <p class="mb-1 text-muted-custom"><strong>BP:</strong> {{ rec.blood_pressure|default:"N/A" }} | <strong>Weight:</strong> {{ rec.weight_kg|default:"N/A" }} kg | <strong>Temp:</strong> {{ rec.temperature_f|default:"N/A" }} &deg;F</p>
+                    <a href="{% url 'medical_record_view' rec.id %}" class="small fw-semibold text-rose" style="color: var(--primary-rose);">View Full Details</a>
+                </div>
+                {% empty %}
+                <p class="text-muted py-3">No recent vital signs logged.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

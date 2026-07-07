@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block title %}Doctor Registration | BloomCare Hospital{% endblock %}
+
+{% block content %}
+<div class="row py-4">
+    <div class="col-md-7 mx-auto">
+        <div class="card card-hospital p-4 p-md-5" style="border-top: 5px solid var(--primary-pink-dark);">
+            <div class="text-center mb-4">
+                <span class="fs-2 brand-font"><i class="bi bi-heart-pulse-fill text-danger"></i> BloomCare</span>
+                <h3 class="mt-2 brand-font">Doctor Registration</h3>
+                <p class="text-muted small">Register to consult patient requests and manage clinical prescriptions</p>
+            </div>
+            
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <h5 class="brand-font mb-3 text-rose" style="color: var(--primary-pink-dark);">1. Account Credentials</h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label small fw-semibold">Doctor Name</label>
+                        {{ form.doctor_name }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label small fw-semibold">Age</label>
+                        {{ form.age }}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">Gmail Address</label>
+                    {{ form.gmail }}
+                </div>
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label small fw-semibold">Password</label>
+                        {{ form.password }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label small fw-semibold">Confirm Password</label>
+                        {{ form.confirm_password }}
+                    </div>
+                </div>
+                
+                <h5 class="brand-font mb-3 text-rose" style="color: var(--primary-pink-dark);">2. Specialty & Professional Profiles</h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label small fw-semibold">Qualification (e.g. MBBS, MD)</label>
+                        {{ form.qualification }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label small fw-semibold">Specialization (e.g. Reproductive Endocrinology)</label>
+                        {{ form.specialization }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label small fw-semibold">Department Mapping</label>
+                        {{ form.department }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label small fw-semibold">Experience (Years)</label>
+                        {{ form.experience }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label small fw-semibold">Hospital Affiliation</label>
+                        {{ form.hospital_name }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label small fw-semibold">Base Consultation Fees</label>
+                        {{ form.consultation_fees }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label small fw-semibold">Available Working Days</label>
+                        {{ form.working_days }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label small fw-semibold">Work Hours Timings</label>
+                        {{ form.work_timings }}
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label small fw-semibold">Upload Doctor Profile Photo</label>
+                    {{ form.doctor_photo }}
+                </div>
+                
+                <button type="submit" class="btn btn-pink w-100 py-3 mb-3"><i class="bi bi-person-check-fill"></i> Complete Registration</button>
+            </form>
+            
+            <div class="text-center mt-3 border-top pt-3" style="border-top-color: var(--border-color) !important;">
+                <p class="small text-muted mb-0">Already registered? <a href="{% url 'doctor_login' %}" class="fw-semibold text-rose" style="color: var(--primary-pink-dark);">Sign In here</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

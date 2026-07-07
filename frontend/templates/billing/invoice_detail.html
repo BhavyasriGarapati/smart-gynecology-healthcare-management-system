@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% block title %}Invoice Receipt Details | BloomCare{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="d-flex justify-content-between align-items-center mb-3 no-print">
+            <a href="{% url 'dashboard' %}" class="btn btn-wellness-outline btn-sm"><i class="bi bi-arrow-left"></i> Back to Dashboard</a>
+            <div>
+                <button onclick="window.print()" class="btn btn-wellness-teal btn-sm"><i class="bi bi-printer"></i> Print Receipt</button>
+                {% if invoice.status == 'PENDING' %}
+                    <a href="{% url 'pay_invoice' invoice.id %}" class="btn btn-wellness-rose btn-sm"><i class="bi bi-credit-card"></i> Pay Invoice</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card card-wellness p-4 p-md-5 bg-white border">
+            <!-- Header section -->
+            <div class="border-bottom pb-4 mb-4 d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="brand-font mb-1"><i class="bi bi-flower1" style="color: var(--primary-rose);"></i> BloomCare Clinic</h2>
+                    <p class="text-muted small mb-0">123 Wellness Way, Suite A • billing@bloomcare.com</p>
+                </div>
+                <div class="text-md-end">
+                    <h4 class="brand-font mb-0 text-uppercase tracking-wide text-rose" style="color: var(--primary-rose);">Invoice Receipt</h4>
+                    <p class="small text-muted mb-0">Invoice: #INV-10{{ invoice.id }}</p>
+                    <p class="small text-muted mb-0">Date: {{ invoice.created_at|date:"M d, Y" }}</p>
+                </div>
+            </div>
+
+            <!-- Billing details -->
+            <div class="row mb-4">
+                <div class="col-md-6 small">
+                    <p class="mb-1 text-muted text-uppercase fw-semibold">Billing To:</p>
+                    <p class="mb-1 fw-bold">{{ invoice.patient.get_full_name }}</p>
+                    <p class="mb-1">Phone: {{ invoice.patient.phone_number|default:"-" }}</p>
+                    <p class="mb-0">Address: {{ invoice.patient.address|default:"-" }}</p>
+                </div>
+                <div class="col-md-6 text-md-end small">
+                    <p class="mb-1 text-muted text-uppercase fw-semibold">Payment Status:</p>
+                    <p class="mb-2">
+                        {% if invoice.status == 'PAID' %}
+                            <span class="badge bg-success text-white px-3 py-2 rounded-pill"><i class="bi bi-check-circle-fill"></i> PAID</span>
+                        {% else %}
+                            <span class="badge bg-danger text-white px-3 py-2 rounded-pill"><i class="bi bi-exclamation-circle-fill"></i> PENDING</span>
+                        {% endif %}
+                    </p>
+                    <p class="mb-0"><strong>Method:</strong> {{ invoice.get_payment_method_display }}</p>
+                    {% if invoice.paid_at %}
+                        <p class="mb-0 text-muted"><strong>Paid At:</strong> {{ invoice.paid_at }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Service Items Table -->
+            <div class="table-responsive mb-4">
+                <table class="table table-bordered small">
+                    <thead style="background-color: var(--primary-rose-light);">
+                        <tr>
+                            <th>Description</th>
+                            <th class="text-end" style="width: 150px;">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <strong>Gynecological Consultation & Medical Examination</strong><br>
+                                <span class="text-muted-custom small">Consultation Fee under Dr. {{ invoice.medical_record.doctor.get_full_name }}</span>
+                            </td>
+                            <td class="text-end">₹{{ invoice.amount }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-end">Subtotal</td>
+                            <td class="text-end">₹{{ invoice.amount }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-end text-muted">Clinician Service Tax (5%)</td>
+                            <td class="text-end text-muted">₹{{ invoice.tax_amount }}</td>
+                        </tr>
+                        <tr class="fw-bold" style="background-color: #FAFAFA;">
+                            <td class="text-end">Total Due</td>
+                            <td class="text-end text-rose" style="color: var(--primary-rose);">₹{{ invoice.total_amount }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Invoice Footer -->
+            <div class="border-top pt-4 mt-5 text-center text-muted small">
+                <p class="mb-1">Thank you for choosing BloomCare. We are dedicated to supporting your healthcare journey.</p>
+                <p class="mb-0">This is a system-generated electronic receipt. No physical signature is required.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

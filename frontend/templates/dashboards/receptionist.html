@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% block title %}Receptionist Dashboard | BloomCare{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="p-4 bg-white rounded-4 border border-1 d-flex flex-wrap align-items-between justify-content-between">
+            <div>
+                <span class="badge text-uppercase tracking-wider px-3 py-2 mb-2 metric-badge metric-badge-rose">Receptionist Portal</span>
+                <h2 class="brand-font mb-1">Administrative & Front Desk Workstation</h2>
+                <p class="text-muted-custom small mb-0">Schedule consultations, handle patient inquiries, generate invoices, and record checkouts</p>
+            </div>
+            <div class="mt-3 mt-md-0 d-flex gap-2">
+                <a href="{% url 'book_appointment' %}" class="btn btn-wellness-rose"><i class="bi bi-calendar-plus"></i> New Booking</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Appointments list -->
+    <div class="col-lg-6 mb-4">
+        <div class="card card-wellness p-4 h-100">
+            <h4 class="brand-font mb-3"><i class="bi bi-calendar-range-fill text-rose" style="color: var(--primary-rose);"></i> Patient Consultation Bookings</h4>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle small">
+                    <thead>
+                        <tr>
+                            <th>Patient</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for appt in appointments %}
+                        <tr>
+                            <td class="fw-semibold">{{ appt.patient.get_full_name }}</td>
+                            <td>{{ appt.appointment_date|date:"M d, Y" }}</td>
+                            <td>{{ appt.time_slot }}</td>
+                            <td>
+                                {% if appt.status == 'SCHEDULED' %}
+                                    <span class="badge bg-primary-subtle text-primary border-0 rounded-pill px-2">Scheduled</span>
+                                {% elif appt.status == 'CHECKED_IN' %}
+                                    <span class="badge bg-warning-subtle text-warning border-0 rounded-pill px-2">Checked In</span>
+                                {% elif appt.status == 'COMPLETED' %}
+                                    <span class="badge bg-success-subtle text-success border-0 rounded-pill px-2">Completed</span>
+                                {% else %}
+                                    <span class="badge bg-danger-subtle text-danger border-0 rounded-pill px-2">Cancelled</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center py-4 text-muted">No appointments recorded yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invoices -->
+    <div class="col-lg-6 mb-4">
+        <div class="card card-wellness p-4 h-100">
+            <h4 class="brand-font mb-3"><i class="bi bi-currency-dollar text-teal" style="color: var(--accent-teal);"></i> Invoicing & Payments</h4>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle small">
+                    <thead>
+                        <tr>
+                            <th>Invoice ID</th>
+                            <th>Patient</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for invoice in invoices %}
+                        <tr>
+                            <td>#INV-10{{ invoice.id }}</td>
+                            <td class="fw-semibold">{{ invoice.patient.get_full_name }}</td>
+                            <td class="fw-bold">₹{{ invoice.total_amount }}</td>
+                            <td>
+                                {% if invoice.status == 'PAID' %}
+                                    <span class="badge bg-success-subtle text-success border-0 rounded-pill px-2">Paid</span>
+                                {% else %}
+                                    <span class="badge bg-danger-subtle text-danger border-0 rounded-pill px-2">Pending</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group gap-1">
+                                    <a href="{% url 'view_invoice' invoice.id %}" class="btn btn-sm btn-wellness-outline py-1"><i class="bi bi-eye"></i> View</a>
+                                    {% if invoice.status == 'PENDING' %}
+                                        <a href="{% url 'pay_invoice' invoice.id %}" class="btn btn-sm btn-wellness-teal py-1">Mark Paid</a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-4 text-muted">No billing invoices generated yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

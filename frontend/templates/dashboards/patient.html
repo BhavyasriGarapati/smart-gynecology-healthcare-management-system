@@ -1,0 +1,281 @@
+{% extends 'base.html' %}
+{% block title %}Patient Portal | BloomCare{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="p-4 bg-white rounded-4 border border-1 d-flex flex-wrap align-items-center justify-content-between">
+            <div>
+                <span class="badge text-uppercase tracking-wider px-3 py-2 mb-2 metric-badge metric-badge-rose">Patient Portal</span>
+                <h2 class="brand-font mb-1">Welcome, {{ user.get_full_name }}</h2>
+                <p class="text-muted-custom small mb-0">MRN-100{{ user.id }} • Log data, review health records, and download prescriptions</p>
+            </div>
+            <div class="mt-3 mt-md-0 d-flex gap-2">
+                <a href="{% url 'book_appointment' %}" class="btn btn-wellness-rose"><i class="bi bi-calendar-plus"></i> Request Consultation Slot</a>
+                <a href="{% url 'upload_lab_report' %}" class="btn btn-wellness-teal"><i class="bi bi-cloud-upload"></i> Upload Diagnostic File</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Left Column: Trackers & Logs -->
+    <div class="col-lg-5 mb-4">
+        <!-- Pregnancy Tracker -->
+        <div class="card card-wellness mb-4 p-4">
+            <h4 class="brand-font mb-3"><i class="bi bi-heart-pulse-fill text-rose" style="color: var(--primary-rose);"></i> Pregnancy Tracker</h4>
+            {% if pregnancy_log %}
+                <div class="text-center py-3">
+                    <div class="tracker-circle">
+                        <span class="fs-3 fw-bold">{{ pregnancy_log.current_week }}</span>
+                        <span class="small text-muted" style="font-size: 0.75rem;">Weeks</span>
+                    </div>
+                    <h5 class="brand-font mt-2">Baby size: {{ pregnancy_log.baby_size_comparison }}</h5>
+                    <p class="text-muted-custom small px-3">EDD: {{ pregnancy_log.edd|date:"F d, Y" }}</p>
+                </div>
+                <div class="bg-light p-3 rounded-4 small">
+                    <p class="mb-1"><strong>LMP:</strong> {{ pregnancy_log.last_menstrual_period }}</p>
+                    <p class="mb-0 text-muted-custom"><strong>Notes:</strong> {{ pregnancy_log.notes|default:"No custom notes added." }}</p>
+                </div>
+            {% else %}
+                <p class="small text-muted-custom">Log your pregnancy stage to estimate baby sizing landmarks, calculate due dates, and monitor weekly growth milestones.</p>
+            {% endif %}
+            <div class="text-center mt-3">
+                <a href="{% url 'log_pregnancy' %}" class="btn btn-wellness-outline btn-sm w-100"><i class="bi bi-pencil"></i> Update Pregnancy Log</a>
+            </div>
+        </div>
+
+        <!-- Cycle Predictor -->
+        <div class="card card-wellness mb-4 p-4">
+            <h4 class="brand-font mb-3"><i class="bi bi-calendar-heart text-teal" style="color: var(--accent-teal);"></i> Menstrual Cycle Log</h4>
+            {% if predictions %}
+                <div class="text-center py-3">
+                    <div class="tracker-circle-teal">
+                        <span class="fs-6 fw-bold">Next Period</span>
+                        <span class="small text-muted" style="font-size: 0.75rem;">{{ predictions.next_period|date:"M d" }}</span>
+                    </div>
+                </div>
+                <div class="bg-light p-3 rounded-4 small mb-3">
+                    <ul class="list-unstyled mb-0 lh-lg">
+                        <li><i class="bi bi-arrow-right-short text-rose"></i> <strong>Estimated Ovulation:</strong> {{ predictions.ovulation|date:"F d, Y" }}</li>
+                        <li><i class="bi bi-arrow-right-short text-rose"></i> <strong>Fertile Window:</strong> {{ predictions.fertile_start|date:"M d" }} - {{ predictions.fertile_end|date:"M d" }}</li>
+                        <li><i class="bi bi-arrow-right-short text-rose"></i> <strong>Avg Cycle Length:</strong> {{ cycle_log.cycle_length }} Days</li>
+                    </ul>
+                </div>
+            {% else %}
+                <p class="small text-muted-custom">Input cycle lengths to visualize cycle trends, estimate fertile windows, and schedule check-ups accordingly.</p>
+            {% endif %}
+            <div class="text-center">
+                <a href="{% url 'log_cycle' %}" class="btn btn-wellness-outline btn-sm w-100"><i class="bi bi-pencil"></i> Log Menstrual History</a>
+            </div>
+        </div>
+        
+        <!-- Weight/Vitals Trend Chart -->
+        <div class="card card-wellness mb-4 p-4">
+            <h4 class="brand-font mb-3"><i class="bi bi-graph-up-arrow text-teal" style="color: var(--accent-teal);"></i> Vitals History (Chart.js)</h4>
+            <canvas id="patientVitalsChart" style="max-height: 200px;"></canvas>
+        </div>
+    </div>
+
+    <!-- Right Column: Medical History & Documents -->
+    <div class="col-lg-7">
+        <!-- Appointments -->
+        <div class="card card-wellness mb-4 p-4">
+            <h4 class="brand-font mb-3"><i class="bi bi-calendar-check text-rose" style="color: var(--primary-rose);"></i> Recent Bookings</h4>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle small">
+                    <thead>
+                        <tr>
+                            <th>Doctor</th>
+                            <th>Date</th>
+                            <th>Slot</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for appt in appointments %}
+                        <tr>
+                            <td class="fw-semibold">Dr. {{ appt.doctor.get_full_name }}</td>
+                            <td>{{ appt.appointment_date|date:"M d, Y" }}</td>
+                            <td>{{ appt.time_slot }}</td>
+                            <td>
+                                {% if appt.status == 'PENDING' %}
+                                    <span class="badge bg-secondary-subtle text-dark border-0 rounded-pill px-2">Pending</span>
+                                {% elif appt.status == 'CONFIRMED' %}
+                                    <span class="badge bg-primary-subtle text-primary border-0 rounded-pill px-2">Confirmed</span>
+                                {% elif appt.status == 'IN_PROGRESS' %}
+                                    <span class="badge bg-warning-subtle text-warning border-0 rounded-pill px-2">In Progress</span>
+                                {% elif appt.status == 'COMPLETED' %}
+                                    <span class="badge bg-success-subtle text-success border-0 rounded-pill px-2">Completed</span>
+                                {% else %}
+                                    <span class="badge bg-danger-subtle text-danger border-0 rounded-pill px-2">Cancelled</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if appt.status == 'PENDING' or appt.status == 'CONFIRMED' %}
+                                    <a href="{% url 'cancel_appointment' appt.id %}" class="btn btn-sm btn-outline-danger border-0"><i class="bi bi-x-circle"></i> Cancel</a>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-3 text-muted">No appointments found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Electronic Health Records (EHR) -->
+        <div class="card card-wellness mb-4 p-4">
+            <h4 class="brand-font mb-3"><i class="bi bi-prescription text-rose" style="color: var(--primary-rose);"></i> Clinical Records & E-Prescriptions</h4>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle small">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Gynecologist</th>
+                            <th>Diagnosis</th>
+                            <th>Downloads</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in medical_records %}
+                        <tr>
+                            <td>{{ record.visit_date|date:"M d, Y" }}</td>
+                            <td class="fw-semibold">Dr. {{ record.doctor.get_full_name }}</td>
+                            <td>{{ record.diagnosis|truncatewords:6 }}</td>
+                            <td>
+                                <div class="btn-group gap-1">
+                                    <a href="{% url 'medical_record_view' record.id %}" class="btn btn-sm btn-wellness-outline py-1 px-3">EHR Detail</a>
+                                    <a href="{% url 'download_prescription_pdf' record.id %}" target="_blank" class="btn btn-sm btn-wellness-rose py-1"><i class="bi bi-file-pdf"></i> Download PDF</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center py-3 text-muted">No medical records on file.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Uploaded Reports -->
+        <div class="card card-wellness mb-4 p-4">
+            <h4 class="brand-font mb-3"><i class="bi bi-file-earmark-pdf text-teal" style="color: var(--accent-teal);"></i> Diagnostic Scans & Laboratory Reports</h4>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle small">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Title</th>
+                            <th>File</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for report in lab_reports %}
+                        <tr>
+                            <td>{{ report.uploaded_at|date:"M d, Y" }}</td>
+                            <td><span class="badge bg-secondary-subtle text-dark border-0">{{ report.get_report_type_display }}</span></td>
+                            <td class="fw-semibold">{{ report.title }}</td>
+                            <td>
+                                <a href="{{ report.file.url }}" target="_blank" class="btn btn-sm btn-wellness-outline py-1"><i class="bi bi-download"></i> Download</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center py-3 text-muted">No diagnostic files uploaded yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Invoices -->
+        <div class="card card-wellness mb-4 p-4">
+            <h4 class="brand-font mb-3"><i class="bi bi-receipt text-rose" style="color: var(--primary-rose);"></i> Invoices & Billing Receipt History</h4>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle small">
+                    <thead>
+                        <tr>
+                            <th>Invoice ID</th>
+                            <th>Created At</th>
+                            <th>Total Amt</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for invoice in invoices %}
+                        <tr>
+                            <td>#INV-10{{ invoice.id }}</td>
+                            <td>{{ invoice.created_at|date:"M d, Y" }}</td>
+                            <td class="fw-bold">₹{{ invoice.total_amount }}</td>
+                            <td>
+                                {% if invoice.status == 'PAID' %}
+                                    <span class="badge bg-success-subtle text-success border-0 rounded-pill px-2">Paid</span>
+                                {% else %}
+                                    <span class="badge bg-danger-subtle text-danger border-0 rounded-pill px-2">Pending</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'view_invoice' invoice.id %}" class="btn btn-sm btn-wellness-outline py-1">Receipt Details</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-3 text-muted">No invoices available.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const ctx = document.getElementById('patientVitalsChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Week 1', 'Week 4', 'Week 8', 'Week 12', 'Week 16'],
+                datasets: [{
+                    label: 'Weight Progression (kg)',
+                    data: [60, 60.5, 61.2, 62.5, 64.0],
+                    borderColor: '#D9A08B', // Rose
+                    backgroundColor: 'rgba(217, 160, 139, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

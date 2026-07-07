@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block title %}Manage EHR & Electronic Prescription | BloomCare{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-9 mx-auto">
+        <div class="card card-wellness p-4 p-md-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="brand-font mb-0"><i class="bi bi-file-earmark-medical text-rose" style="color: var(--primary-rose);"></i> Electronic Health Record (EHR)</h3>
+                <span class="badge bg-secondary-subtle text-dark border-0 p-2">Appt #{{ appointment.id }}</span>
+            </div>
+            
+            <div class="bg-light p-3 rounded-4 mb-4 small">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="mb-1"><strong>Patient:</strong> {{ appointment.patient.get_full_name }}</p>
+                        <p class="mb-0"><strong>Age/DOB:</strong> {{ appointment.patient.patient_profile.date_of_birth|default:"Not Logged" }}</p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <p class="mb-1"><strong>Date:</strong> {{ appointment.appointment_date }}</p>
+                        <p class="mb-0"><strong>Consultant:</strong> Dr. {{ appointment.doctor.get_full_name }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <form method="post">
+                {% csrf_token %}
+                
+                <h5 class="brand-font text-rose mb-3" style="color: var(--primary-rose);">1. Clinical Vitals (Nurse/Doctor logs)</h5>
+                <div class="row mb-4">
+                    <div class="col-md-3 mb-3">
+                        <label for="id_weight_kg" class="form-label small fw-semibold">Weight (kg)</label>
+                        {{ form.weight_kg }}
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="id_blood_pressure" class="form-label small fw-semibold">Blood Pressure (BP)</label>
+                        {{ form.blood_pressure }}
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="id_temperature_f" class="form-label small fw-semibold">Temperature (&deg;F)</label>
+                        {{ form.temperature_f }}
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="id_heart_rate_bpm" class="form-label small fw-semibold">Heart Rate (bpm)</label>
+                        {{ form.heart_rate_bpm }}
+                    </div>
+                </div>
+                
+                <h5 class="brand-font text-rose mb-3" style="color: var(--primary-rose);">2. Examination Details</h5>
+                <div class="mb-3">
+                    <label for="id_symptoms" class="form-label small fw-semibold">Subjective Symptoms</label>
+                    {{ form.symptoms }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_diagnosis" class="form-label small fw-semibold">Clinical Diagnosis</label>
+                    {{ form.diagnosis }}
+                </div>
+                <div class="mb-4">
+                    <label for="id_treatment_plan" class="form-label small fw-semibold">Clinical Management / Treatment Plan</label>
+                    {{ form.treatment_plan }}
+                </div>
+                
+                <h5 class="brand-font text-rose mb-3" style="color: var(--primary-rose);">3. Electronic Prescription</h5>
+                <div class="mb-3">
+                    <label for="id_prescription_medicines" class="form-label small fw-semibold">Prescribed Medications</label>
+                    {{ form.prescription_medicines }}
+                </div>
+                <div class="mb-4">
+                    <label for="id_prescription_dosage" class="form-label small fw-semibold">Dosage, Timing & Directions</label>
+                    {{ form.prescription_dosage }}
+                </div>
+                
+                <div class="d-flex gap-2 justify-content-end">
+                    <a href="{% url 'dashboard' %}" class="btn btn-wellness-outline px-4">Cancel</a>
+                    <button type="submit" class="btn btn-wellness-rose px-5"><i class="bi bi-file-earmark-check"></i> Save Record</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

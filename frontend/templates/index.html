@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% block title %}BloomCare Hospital | Specialized Gynecology & Obstetrics{% endblock %}
+
+{% block content %}
+<!-- Hero Banner & Hospital Introduction -->
+<div class="row align-items-center mb-5 py-4 hero-hospital">
+    <div class="col-lg-6 mb-4 mb-lg-0">
+        <span class="badge text-uppercase bg-white text-danger px-3 py-2 mb-3 shadow-sm border border-light">Leading Gynecology Clinic</span>
+        <h1 class="display-5 fw-bold mb-3 brand-font">Compassionate Healthcare for Women at Every Stage of Life</h1>
+        <p class="lead text-muted mb-4">
+            Welcome to BloomCare Hospital, where cutting-edge medical technologies meet warm, empathetic patient care. We specialize in comprehensive obstetric, fertility, menopause, and gynecological oncology services.
+        </p>
+        <div class="d-flex gap-3 flex-wrap">
+            {% if user.is_authenticated %}
+                <a href="{% url 'dashboard' %}" class="btn btn-pink btn-lg px-4 py-3"><i class="bi bi-grid-fill"></i> Access Portal Dashboard</a>
+            {% else %}
+                <a href="{% url 'patient_login' %}" class="btn btn-pink btn-lg px-4 py-3">Patient Portal</a>
+                <a href="{% url 'doctor_login' %}" class="btn btn-outline-pink btn-lg px-4 py-3">Doctor Portal</a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card border-0 p-4 bg-white shadow-sm rounded-4 text-center">
+            <h3 class="brand-font mb-3"><i class="bi bi-shield-check text-danger"></i> Smart Symptom Checker</h3>
+            <p class="text-muted small">Select your symptoms to search for matching specialists within our hospital departments instantly.</p>
+            <a href="{% url 'patient_symptom_checker' %}" class="btn btn-pink w-100 py-3"><i class="bi bi-search"></i> Check Symptoms & Doctors</a>
+        </div>
+    </div>
+</div>
+
+<!-- About Hospital -->
+<div class="row align-items-center mb-5 py-3">
+    <div class="col-md-6 mb-4 mb-md-0">
+        <div class="p-3 bg-light rounded-4 border">
+            <h4 class="brand-font mb-3"><i class="bi bi-heart-pulse-fill text-danger"></i> Our Mission & Heritage</h4>
+            <p class="text-muted small mb-0">BloomCare Hospital has been serving women's health needs for over a decade. We combine advanced diagnostic tools, professional clinical environments, and individualized treatment solutions. Our dedicated staff is devoted to giving you a safe, welcoming, and healing medical experience.</p>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <h2 class="brand-font mb-3">About BloomCare Hospital</h2>
+        <p class="text-muted small">We provide a wide array of sub-specializations, covering basic and complex surgical needs. Our obstetricians and IVF doctors coordinate to implement state-of-the-art care plans for patients of all ages.</p>
+    </div>
+</div>
+
+<!-- Services -->
+<div class="row text-center mb-5 g-4">
+    <div class="col-12 mb-2">
+        <h2 class="brand-font">Our Clinical Services</h2>
+        <p class="text-muted">Specialized departments committed to medical excellence.</p>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-hospital h-100 p-4">
+            <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center p-3 mb-3 mx-auto" style="width: 70px; height: 70px; background-color: var(--bg-pink-light) !important;">
+                <i class="bi bi-balloon-fill text-danger fs-3"></i>
+            </div>
+            <h4 class="brand-font">Obstetric Care</h4>
+            <p class="small text-muted mb-0">Comprehensive prenatal milestone checkups, labor monitoring, post-partum recovery support, and baby growth tracking logs.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-hospital h-100 p-4">
+            <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center p-3 mb-3 mx-auto" style="width: 70px; height: 70px; background-color: var(--bg-pink-light) !important;">
+                <i class="bi bi-activity text-danger fs-3"></i>
+            </div>
+            <h4 class="brand-font">Fertility & IVF</h4>
+            <p class="small text-muted mb-0">Hormonal panels, ovulation tracking, letrozole management, and reproductive endocrinology diagnostics.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-hospital h-100 p-4">
+            <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center p-3 mb-3 mx-auto" style="width: 70px; height: 70px; background-color: var(--bg-pink-light) !important;">
+                <i class="bi bi-shield-plus text-danger fs-3"></i>
+            </div>
+            <h4 class="brand-font">Oncology & Surgery</h4>
+            <p class="small text-muted mb-0">Screenings for fibroids, cyst evaluations, and laparoscopy treatments under specialized care.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Why Choose Us -->
+<div class="row align-items-center mb-5 py-3">
+    <div class="col-md-6 order-md-2 mb-4 mb-md-0">
+        <div class="p-3 bg-light rounded-4 border">
+            <ul class="list-unstyled mb-0 lh-lg text-muted small">
+                <li><i class="bi bi-check-circle-fill text-danger me-2"></i> Board-certified gynecological specialists with over 15+ years of practice.</li>
+                <li><i class="bi bi-check-circle-fill text-danger me-2"></i> Clean, state-of-the-art clinic and testing laboratory vaults.</li>
+                <li><i class="bi bi-check-circle-fill text-danger me-2"></i> Decoupled digital dashboards providing transparent records of prescriptions, cycles, and lab diagnostics.</li>
+            </ul>
+        </div>
+    </div>
+    <div class="col-md-6 order-md-1">
+        <h2 class="brand-font mb-3">Why Choose Our Hospital</h2>
+        <p class="text-muted small">We put patient safety and records access at the forefront. Through integrated databases, your electronic prescriptions, lab analysis PDFs, and appointments are synchronized securely.</p>
+    </div>
+</div>
+
+<!-- Meet Our Specialists (6 cards) -->
+<div class="row mb-5">
+    <div class="col-12 mb-4 text-center">
+        <h2 class="brand-font">Meet Our Specialists</h2>
+        <p class="text-muted">Consult with our professional Obstetricians & Gynecologists.</p>
+    </div>
+    
+    <div class="row g-4">
+        {% for doctor in doctors %}
+        <div class="col-md-4">
+            <div class="card card-hospital h-100 p-3 d-flex flex-column justify-content-between">
+                <div class="text-center mb-3">
+                    {% if doctor.profile_photo %}
+                        <img src="{{ doctor.profile_photo.url }}" class="rounded-circle mb-3 shadow-sm" style="width: 100px; height: 100px; object-fit: cover; border: 3px solid var(--primary-pink);">
+                    {% else %}
+                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mb-3 mx-auto" style="width: 100px; height: 100px; background-color: var(--bg-pink-light) !important; border: 3px solid var(--primary-pink);">
+                            <i class="bi bi-person-fill fs-1" style="color: var(--primary-pink-dark);"></i>
+                        </div>
+                    {% endif %}
+                    <h4 class="brand-font mb-1">Dr. {{ doctor.user.username }}</h4>
+                    <p class="small text-muted mb-0">{{ doctor.qualification }}</p>
+                    <span class="badge bg-light text-rose border mt-1" style="color: var(--primary-pink-dark); border-color: var(--border-color) !important;">{{ doctor.department }}</span>
+                </div>
+                
+                <div class="small text-muted mb-3">
+                    <ul class="list-unstyled mb-0 lh-lg">
+                        <li><strong>Specialization:</strong> {{ doctor.specialization }}</li>
+                        <li><strong>Available Days:</strong> {{ doctor.working_days }}</li>
+                        <li><strong>Timings:</strong> {{ doctor.work_timings }}</li>
+                        <li><strong>Experience:</strong> {{ doctor.experience }} Years</li>
+                        <li><strong>Fees:</strong> Base ₹{{ doctor.consultation_fee }}</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <a href="{% url 'patient_book_appointment' %}?doctor_id={{ doctor.id }}" class="btn btn-pink w-100"><i class="bi bi-calendar-plus"></i> Book Appointment</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-4">
+            <p class="text-muted small">No specialists registered in the hospital database yet.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
