@@ -21,6 +21,22 @@ class User(AbstractUser):
         return self.role == 'PATIENT'
 
 class DoctorProfile(models.Model):
+    STATUS_CHOICES = (
+        ('Available', 'Available'),
+        ('Busy', 'Busy'),
+        ('On Leave', 'On Leave'),
+        ('Emergency Surgery', 'Emergency Surgery'),
+        ('Meeting', 'Meeting'),
+        ('Personal Leave', 'Personal Leave'),
+        ('Training', 'Training'),
+        ('Conference', 'Conference'),
+    )
+    APPROVAL_CHOICES = (
+        ('Pending', 'Pending'),
+        ('Approved', 'Approved'),
+        ('Suspended', 'Suspended'),
+        ('Rejected', 'Rejected'),
+    )
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='doctor_profile')
     age = models.PositiveIntegerField(default=35)
     qualification = models.CharField(max_length=100)
@@ -38,6 +54,21 @@ class DoctorProfile(models.Model):
     working_days = models.CharField(max_length=100, default='Monday to Saturday')
     consultation_fee = models.DecimalField(max_digits=10, decimal_places=2, default=500.00)
     profile_photo = models.ImageField(upload_to='doctors/', blank=True, null=True)
+    
+    # New Doctor Status & Approval Fields
+    status = models.CharField(max_length=30, choices=STATUS_CHOICES, default='Available')
+    approval_status = models.CharField(max_length=20, choices=APPROVAL_CHOICES, default='Pending')
+
+    @property
+    def average_rating(self):
+        revs = self.reviews.all()
+        if not revs.exists():
+            return 5.0
+        return round(sum(r.rating for r in revs) / revs.count(), 1)
+
+    @property
+    def total_reviews(self):
+        return self.reviews.count()
 
     def calculate_age_based_fee(self, patient_age):
         try:
@@ -73,7 +104,13 @@ class Appointment(models.Model):
         ('Accepted', 'Accepted'),
         ('In Progress', 'In Progress'),
         ('Completed', 'Completed'),
+        ('Rejected', 'Rejected'),
         ('Cancelled', 'Cancelled'),
+    )
+    ADMIN_APPROVAL_CHOICES = (
+        ('Pending', 'Pending'),
+        ('Approved', 'Approved'),
+        ('Rejected', 'Rejected'),
     )
     appointment_number = models.CharField(max_length=20, unique=True, blank=True)
     patient = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'PATIENT'}, related_name='appointments_as_patient')
@@ -86,11 +123,15 @@ class Appointment(models.Model):
     doctor = models.ForeignKey(DoctorProfile, on_delete=models.CASCADE, related_name='appointments')
     appointment_date = models.DateField()
     time_slot = models.CharField(max_length=50)
-    remarks = models.TextField(blank=True, null=True)
+    remarks = models.TextField(blank=True, null=True) # Kept but optional/not in form
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
     doctor_notes = models.TextField(blank=True, null=True)
     is_case_completed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    
+    # New Fields for Doctor Feedback Messages & Admin Approval state
+    doctor_message = models.TextField(blank=True, null=True)
+    admin_approved = models.CharField(max_length=20, choices=ADMIN_APPROVAL_CHOICES, default='Pending')
 
     def save(self, *args, **kwargs):
         if not self.appointment_number:
@@ -117,7 +158,7 @@ class LaboratoryTest(models.Model):
     test_name = models.CharField(max_length=50, choices=TEST_CHOICES)
     pdf_report = models.FileField(upload_to='lab_reports/', blank=True, null=True)
     prescribed_at = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(max_length=20, default='Prescribed') # Prescribed, Uploaded
+    status = models.CharField(max_length=20, default='Prescribed')
 
     def __str__(self):
         return f"{self.test_name} for {self.appointment.patient_name}"
@@ -143,8 +184,38 @@ class PrescribedMedicine(models.Model):
     dosage_morning = models.BooleanField(default=False)
     dosage_afternoon = models.BooleanField(default=False)
     dosage_night = models.BooleanField(default=False)
-    duration = models.CharField(max_length=50) # e.g. "5 days", "1 month"
+    duration = models.CharField(max_length=50)
     prescribed_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.medicine_name} for {self.appointment.patient_name}"
+
+# New Doctor Rating / Patient Review Model
+class Review(models.Model):
+    patient = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'PATIENT'})
+    doctor = models.ForeignKey(DoctorProfile, on_delete=models.CASCADE, related_name='reviews')
+    rating = models.PositiveIntegerField(default=5)
+    review = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Review by {self.patient.username} for Dr. {self.doctor.user.username} ({self.rating} stars)"
+
+# New Notifications Tracking Model
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Notification for {self.user.username}: {self.message[:30]}"
+
+# New OTP Validation for Password Reset
+class OTPVerification(models.Model):
+    gmail = models.EmailField()
+    otp = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"OTP for {self.gmail}: {self.otp}"

@@ -1,5 +1,5 @@
 from django import forms
-from .models import User, DoctorProfile, PatientProfile, Appointment, LaboratoryTest, PrescribedMedicine
+from .models import User, DoctorProfile, PatientProfile, Appointment, LaboratoryTest, PrescribedMedicine, Review
 
 class PatientRegistrationForm(forms.Form):
     full_name = forms.CharField(max_length=150, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Full Name'}))
@@ -45,7 +45,7 @@ class AppointmentBookingForm(forms.ModelForm):
         model = Appointment
         fields = [
             'patient_name', 'age', 'blood_group', 'height', 'weight',
-            'selected_symptom', 'doctor', 'appointment_date', 'time_slot', 'remarks'
+            'selected_symptom', 'doctor', 'appointment_date', 'time_slot'
         ]
         widgets = {
             'patient_name': forms.TextInput(attrs={'class': 'form-control'}),
@@ -70,19 +70,24 @@ class AppointmentBookingForm(forms.ModelForm):
             'doctor': forms.Select(attrs={'class': 'form-select'}),
             'appointment_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'time_slot': forms.Select(choices=(
-                ('09:00 AM - 10:00 AM', '09:00 AM - 10:00 AM'),
-                ('10:00 AM - 11:00 AM', '10:00 AM - 11:00 AM'),
-                ('11:00 AM - 12:00 PM', '11:00 AM - 12:00 PM'),
-                ('02:00 PM - 03:00 PM', '02:00 PM - 03:00 PM'),
-                ('03:00 PM - 04:00 PM', '03:00 PM - 04:00 PM'),
-                ('04:00 PM - 05:00 PM', '04:00 PM - 05:00 PM'),
+                ('09:00 AM - 09:30 AM', '09:00 AM - 09:30 AM'),
+                ('09:30 AM - 10:00 AM', '09:30 AM - 10:00 AM'),
+                ('10:00 AM - 10:30 AM', '10:00 AM - 10:30 AM'),
+                ('10:30 AM - 11:00 AM', '10:30 AM - 11:00 AM'),
+                ('11:00 AM - 11:30 AM', '11:00 AM - 11:30 AM'),
+                ('11:30 AM - 12:00 PM', '11:30 AM - 12:00 PM'),
+                ('02:00 PM - 02:30 PM', '02:00 PM - 02:30 PM'),
+                ('02:30 PM - 03:00 PM', '02:30 PM - 03:00 PM'),
+                ('03:00 PM - 03:30 PM', '03:00 PM - 03:30 PM'),
+                ('03:30 PM - 04:00 PM', '03:00 PM - 03:30 PM'),
+                ('04:00 PM - 04:30 PM', '04:00 PM - 04:30 PM'),
+                ('04:30 PM - 05:00 PM', '04:30 PM - 05:00 PM'),
             ), attrs={'class': 'form-select'}),
-            'remarks': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['doctor'].queryset = DoctorProfile.objects.all()
+        self.fields['doctor'].queryset = DoctorProfile.objects.filter(approval_status='Approved')
 
 class LabPrescriptionForm(forms.ModelForm):
     class Meta:
@@ -103,4 +108,13 @@ class MedicinePrescriptionForm(forms.ModelForm):
             'dosage_afternoon': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'dosage_night': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'duration': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. 5 days'}),
+        }
+
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model = Review
+        fields = ['rating', 'review']
+        widgets = {
+            'rating': forms.Select(choices=[(i, str(i)) for i in range(1, 6)], attrs={'class': 'form-select'}),
+            'review': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Write your review here...'}),
         }

@@ -11,6 +11,10 @@ urlpatterns = [
     path('login/doctor/', views.doctor_login, name='doctor_login'),
     path('logout/', views.logout_view, name='logout'),
     
+    # Forgot Password Flow
+    path('login/patient/forgot-password/', views.patient_forgot_password, name='patient_forgot_password'),
+    path('login/patient/reset-password/', views.patient_reset_password, name='patient_reset_password'),
+    
     # Router
     path('dashboard/', views.dashboard_router, name='dashboard'),
     
@@ -21,8 +25,7 @@ urlpatterns = [
     path('dashboard/patient/recommendation/', views.patient_doctor_recommendation, name='patient_doctor_recommendation'),
     path('dashboard/patient/book-appointment/', views.patient_book_appointment, name='patient_book_appointment'),
     path('dashboard/patient/appointment-tracking/', views.patient_appointment_tracking, name='patient_appointment_tracking'),
-    path('dashboard/patient/lab-reports/', views.patient_lab_reports, name='patient_lab_reports'),
-    path('dashboard/patient/medicine-details/', views.patient_medicine_details, name='patient_medicine_details'),
+    path('dashboard/patient/review/<int:appointment_id>/', views.patient_write_review, name='patient_write_review'),
     
     # Doctor Dashboard Routes
     path('dashboard/doctor/', views.doctor_dashboard, name='doctor_dashboard'),
@@ -39,9 +42,10 @@ urlpatterns = [
     path('dashboard/admin/delete-appointment/<int:pk>/', views.admin_delete_appointment, name='admin_delete_appointment'),
     path('dashboard/admin/patient/<int:pk>/', views.admin_patient_detail, name='admin_patient_detail'),
     path('dashboard/admin/doctor/<int:pk>/', views.admin_doctor_detail, name='admin_doctor_detail'),
+    path('dashboard/admin/doctor/<int:pk>/status/<str:status>/', views.admin_doctor_status, name='admin_doctor_status'),
+    path('dashboard/admin/appointment/<int:pk>/status/<str:status>/', views.admin_appointment_status, name='admin_appointment_status'),
+    path('dashboard/admin/appointment/<int:pk>/assign/', views.admin_assign_patient, name='admin_assign_patient'),
     
     # Custom Portals & Pages
     path('login/admin/', views.admin_login, name='admin_login'),
-    path('laboratory/', views.laboratory_page, name='laboratory_page'),
-    path('pharmacy/', views.pharmacy_page, name='pharmacy_page'),
 ]
