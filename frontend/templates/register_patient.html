@@ -2,41 +2,74 @@
 {% block title %}Patient Signup | BloomCare Hospital{% endblock %}
 
 {% block content %}
-<div class="row py-5">
-    <div class="col-md-5 mx-auto">
-        <div class="card card-hospital p-4 p-md-5">
+{% load static %}
+<div class="row align-items-center py-5">
+    <!-- Left Side: Registration Form -->
+    <div class="col-lg-6 mb-4 mb-lg-0">
+        <div class="card card-hospital p-4 p-md-5 glass-container">
             <div class="text-center mb-4">
-                <span class="fs-2 brand-font"><i class="bi bi-heart-pulse-fill text-danger"></i> BloomCare</span>
+                <span class="fs-2 brand-font"><i class="fa-solid fa-heart-pulse text-danger" style="color: var(--accent-pink) !important;"></i> BloomCare</span>
                 <h4 class="mt-2 brand-font">Patient Registration</h4>
                 <p class="text-muted small">Sign up to access patient trackers and consult gynecologists</p>
             </div>
             
             <form method="post">
                 {% csrf_token %}
-                <div class="mb-3">
-                    <label class="form-label small fw-semibold">Full Name</label>
+                <div class="form-floating mb-3">
                     {{ form.full_name }}
+                    <label class="small"><i class="fa-solid fa-user me-2 text-muted"></i>Full Name</label>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label small fw-semibold">Gmail</label>
+                <div class="form-floating mb-3">
                     {{ form.gmail }}
+                    <label class="small"><i class="fa-solid fa-envelope me-2 text-muted"></i>Gmail Address</label>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label small fw-semibold">Password</label>
+                <div class="form-floating mb-3 position-relative">
                     {{ form.password }}
+                    <label class="small"><i class="fa-solid fa-lock me-2 text-muted"></i>Password</label>
+                    <button type="button" class="btn btn-link position-absolute end-0 top-50 translate-middle-y text-decoration-none text-muted" onclick="togglePassword('id_password', this)">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
                 </div>
-                <div class="mb-4">
-                    <label class="form-label small fw-semibold">Confirm Password</label>
+                <div class="form-floating mb-4 position-relative">
                     {{ form.confirm_password }}
+                    <label class="small"><i class="fa-solid fa-lock me-2 text-muted"></i>Confirm Password</label>
+                    <button type="button" class="btn btn-link position-absolute end-0 top-50 translate-middle-y text-decoration-none text-muted" onclick="togglePassword('id_confirm_password', this)">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
                 </div>
                 
-                <button type="submit" class="btn btn-pink w-100 py-3 mb-3"><i class="bi bi-person-plus-fill"></i> Register</button>
+                <button type="submit" class="btn btn-pink w-100 py-3 mb-3"><i class="fa-solid fa-user-plus me-2"></i> Register Account</button>
             </form>
             
-            <div class="text-center mt-3 border-top pt-3" style="border-top-color: var(--border-color) !important;">
-                <p class="small text-muted mb-0">Already registered? <a href="{% url 'patient_login' %}" class="fw-semibold text-rose" style="color: var(--primary-pink-dark);">Sign In here</a></p>
+            <div class="text-center mt-3 border-top pt-3" style="border-top-color: var(--border-glass) !important;">
+                <p class="small text-muted mb-0">Already registered? <a href="{% url 'patient_login' %}" class="fw-semibold" style="color: var(--accent-pink);">Sign In here</a></p>
             </div>
         </div>
     </div>
+    
+    <!-- Right Side: Healthcare Illustration -->
+    <div class="col-lg-6 d-none d-lg-block">
+        <div class="text-center ps-lg-4">
+            <img src="{% static 'images/patient_register.jpg' %}" alt="Patient Registration illustration" class="img-fluid rounded-4 shadow-lg border border-light" style="max-height: 480px; object-fit: cover; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.02)';" onmouseout="this.style.transform='scale(1)';">
+            <h4 class="brand-font mt-3">Welcome to Care</h4>
+            <p class="text-muted small">Your personalized obstetrics and family planning companion</p>
+        </div>
+    </div>
 </div>
+
+<script>
+function togglePassword(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const icon = btn.querySelector('i');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+</script>
 {% endblock %}

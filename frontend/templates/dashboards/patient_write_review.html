@@ -1,0 +1,21 @@
+{% extends 'dashboards/patient_base.html' %}
+
+{% block patient_content %}
+<h3 class="brand-font mb-2">Write a Review</h3>
+<p class="text-muted small mb-4">Share your feedback about the specialist consultation with Dr. {{ appointment.doctor.user.username }}.</p>
+
+<form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label class="form-label small fw-semibold">Select Rating (1-5 Stars)</label>
+        {{ form.rating }}
+    </div>
+    
+    <div class="mb-4">
+        <label class="form-label small fw-semibold">Your Review / Observation Feedback</label>
+        {{ form.review }}
+    </div>
+    
+    <button type="submit" class="btn btn-pink w-100 py-3"><i class="bi bi-chat-heart-fill"></i> Submit Review</button>
+</form>
+{% endblock %}

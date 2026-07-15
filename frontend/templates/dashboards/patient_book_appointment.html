@@ -4,6 +4,40 @@
 <h3 class="brand-font mb-2"><i class="bi bi-calendar-plus-fill"></i> Book Appointment</h3>
 <p class="text-muted small mb-4">Submit clinical vitals and booking details to request a consultation.</p>
 
+{% if selected_doctor %}
+<!-- Doctor Profile Card Header -->
+<div class="card card-hospital p-3 mb-4" style="background-color: var(--primary-rose-light); border-color: var(--border-color);">
+    <div class="row align-items-center">
+        <div class="col-md-2 text-center text-md-start">
+            {% if selected_doctor.profile_photo %}
+                <img src="{{ selected_doctor.profile_photo.url }}" class="rounded-circle shadow-sm" style="width: 80px; height: 80px; object-fit: cover; border: 2px solid var(--primary-rose);">
+            {% else %}
+                <div class="rounded-circle bg-white d-flex align-items-center justify-content-center mx-auto" style="width: 80px; height: 80px; border: 2px solid var(--primary-rose);">
+                    <i class="bi bi-person-fill fs-2" style="color: var(--primary-rose);"></i>
+                </div>
+            {% endif %}
+        </div>
+        <div class="col-md-10 mt-3 mt-md-0">
+            <h5 class="brand-font mb-1">Dr. {{ selected_doctor.user.username }}</h5>
+            <p class="small text-muted mb-2">{{ selected_doctor.qualification }} • {{ selected_doctor.specialization }} • Exp: {{ selected_doctor.experience }} Yrs</p>
+            <div class="d-flex flex-wrap gap-3 align-items-center small text-muted">
+                <div><strong>Consultation Fee:</strong> <span class="text-danger fw-bold">₹{{ selected_doctor.consultation_fee }}</span></div>
+                <div class="text-warning">
+                    {% for i in "12345" %}
+                        {% if forloop.counter <= selected_doctor.average_rating %}
+                            <i class="bi bi-star-fill"></i>
+                        {% else %}
+                            <i class="bi bi-star"></i>
+                        {% endif %}
+                    {% endfor %}
+                    <span class="text-muted">({{ selected_doctor.total_reviews }} reviews)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 <form method="post">
     {% csrf_token %}
     
@@ -50,16 +84,11 @@
             {{ form.appointment_date }}
         </div>
         <div class="col-md-6 mb-3">
-            <label class="form-label small fw-semibold">Select Timings Slot</label>
+            <label class="form-label small fw-semibold">Select Timings Slot (30-Min Intervals)</label>
             {{ form.time_slot }}
         </div>
     </div>
     
-    <div class="mb-4">
-        <label class="form-label small fw-semibold">Remarks / Clinical Notes</label>
-        {{ form.remarks }}
-    </div>
-    
-    <button type="submit" class="btn btn-pink w-100 py-3"><i class="bi bi-calendar-check-fill"></i> Book Appointment</button>
+    <button type="submit" class="btn btn-pink w-100 py-3 mt-3"><i class="bi bi-calendar-check-fill"></i> Confirm Booking</button>
 </form>
 {% endblock %}

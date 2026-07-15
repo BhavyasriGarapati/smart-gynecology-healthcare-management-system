@@ -8,11 +8,12 @@
     <table class="table table-hover align-middle small">
         <thead>
             <tr>
-                <th>Appt Number</th>
+                <th>Appointment ID</th>
                 <th>Doctor Name</th>
-                <th>Appointment Date</th>
+                <th>Date</th>
                 <th>Time Slot</th>
-                <th>Current Status</th>
+                <th>Status</th>
+                <th>Doctor Approval</th>
             </tr>
         </thead>
         <tbody>
@@ -27,6 +28,8 @@
                         <span class="badge bg-secondary text-white px-2 py-1">Pending</span>
                     {% elif appt.status == 'Accepted' %}
                         <span class="badge bg-primary text-white px-2 py-1">Accepted</span>
+                    {% elif apt.status == 'Rejected' %}
+                        <span class="badge bg-danger text-white px-2 py-1">Rejected</span>
                     {% elif appt.status == 'In Progress' %}
                         <span class="badge bg-warning text-dark px-2 py-1">In Progress</span>
                     {% elif appt.status == 'Completed' %}
@@ -35,10 +38,19 @@
                         <span class="badge bg-danger text-white px-2 py-1">Cancelled</span>
                     {% endif %}
                 </td>
+                <td>
+                    {% if appt.status == 'Accepted' or appt.status == 'Completed' %}
+                        <span class="text-success"><i class="bi bi-patch-check-fill"></i> Approved</span>
+                    {% elif appt.status == 'Rejected' %}
+                        <span class="text-danger"><i class="bi bi-patch-exclamation-fill"></i> Rejected</span>
+                    {% else %}
+                        <span class="text-muted small">Awaiting doctor decision</span>
+                    {% endif %}
+                </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="5" class="text-center py-4 text-muted">No appointments requested yet.</td>
+                <td colspan="6" class="text-center py-4 text-muted">No appointments requested yet.</td>
             </tr>
             {% endfor %}
         </tbody>

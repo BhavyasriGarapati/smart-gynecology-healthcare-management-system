@@ -2,11 +2,13 @@
 {% block title %}Doctor Registration | BloomCare Hospital{% endblock %}
 
 {% block content %}
-<div class="row py-4">
-    <div class="col-md-7 mx-auto">
-        <div class="card card-hospital p-4 p-md-5" style="border-top: 5px solid var(--primary-pink-dark);">
+{% load static %}
+<div class="row align-items-center py-4">
+    <!-- Left Side: Registration Form -->
+    <div class="col-lg-7 mb-4 mb-lg-0">
+        <div class="card card-hospital p-4 p-md-5 glass-container">
             <div class="text-center mb-4">
-                <span class="fs-2 brand-font"><i class="bi bi-heart-pulse-fill text-danger"></i> BloomCare</span>
+                <span class="fs-2 brand-font"><i class="fa-solid fa-heart-pulse text-danger" style="color: var(--accent-pink) !important;"></i> BloomCare</span>
                 <h3 class="mt-2 brand-font">Doctor Registration</h3>
                 <p class="text-muted small">Register to consult patient requests and manage clinical prescriptions</p>
             </div>
@@ -14,7 +16,7 @@
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 
-                <h5 class="brand-font mb-3 text-rose" style="color: var(--primary-pink-dark);">1. Account Credentials</h5>
+                <h5 class="brand-font mb-3 text-rose" style="color: var(--accent-pink);">1. Account Credentials</h5>
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label small fw-semibold">Doctor Name</label>
@@ -40,7 +42,7 @@
                     </div>
                 </div>
                 
-                <h5 class="brand-font mb-3 text-rose" style="color: var(--primary-pink-dark);">2. Specialty & Professional Profiles</h5>
+                <h5 class="brand-font mb-3 text-rose" style="color: var(--accent-pink);">2. Specialty & Professional Profiles</h5>
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label small fw-semibold">Qualification (e.g. MBBS, MD)</label>
@@ -86,12 +88,21 @@
                     {{ form.doctor_photo }}
                 </div>
                 
-                <button type="submit" class="btn btn-pink w-100 py-3 mb-3"><i class="bi bi-person-check-fill"></i> Complete Registration</button>
+                <button type="submit" class="btn btn-pink w-100 py-3 mb-3"><i class="fa-solid fa-user-check me-2"></i> Complete Registration</button>
             </form>
             
-            <div class="text-center mt-3 border-top pt-3" style="border-top-color: var(--border-color) !important;">
-                <p class="small text-muted mb-0">Already registered? <a href="{% url 'doctor_login' %}" class="fw-semibold text-rose" style="color: var(--primary-pink-dark);">Sign In here</a></p>
+            <div class="text-center mt-3 border-top pt-3" style="border-top-color: var(--border-glass) !important;">
+                <p class="small text-muted mb-0">Already registered? <a href="{% url 'doctor_login' %}" class="fw-semibold" style="color: var(--accent-pink);">Sign In here</a></p>
             </div>
+        </div>
+    </div>
+    
+    <!-- Right Side: Healthcare Illustration -->
+    <div class="col-lg-5 d-none d-lg-block">
+        <div class="text-center ps-lg-4">
+            <img src="{% static 'images/doctor_register.jpg' %}" alt="Doctor Registration illustration" class="img-fluid rounded-4 shadow-lg border border-light" style="max-height: 480px; width: 100%; object-fit: cover; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.02)';" onmouseout="this.style.transform='scale(1)';">
+            <h4 class="brand-font mt-3">Join Our Expert Network</h4>
+            <p class="text-muted small">Access clinical schedules, track prenatal vitals, and issue medical prescriptions</p>
         </div>
     </div>
 </div>

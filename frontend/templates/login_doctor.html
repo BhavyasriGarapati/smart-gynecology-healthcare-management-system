@@ -2,45 +2,78 @@
 {% block title %}Doctor Sign In | BloomCare Hospital{% endblock %}
 
 {% block content %}
-<div class="row py-5">
-    <div class="col-md-5 mx-auto">
-        <div class="card card-hospital p-4 p-md-5" style="border-top: 5px solid var(--primary-pink-dark);">
+{% load static %}
+<div class="row align-items-center py-5">
+    <!-- Left Side: Login Form -->
+    <div class="col-lg-6 mb-4 mb-lg-0">
+        <div class="card card-hospital p-4 p-md-5 glass-container">
             <div class="text-center mb-4">
-                <span class="fs-2 brand-font"><i class="bi bi-heart-pulse-fill text-danger"></i> BloomCare</span>
+                <span class="fs-2 brand-font"><i class="fa-solid fa-heart-pulse text-danger" style="color: var(--accent-pink) !important;"></i> BloomCare</span>
                 <h4 class="mt-2 brand-font">Doctor Login</h4>
                 <p class="text-muted small">Verify coordinates to log in to the gynecologist workspace</p>
             </div>
             
             <form method="post" action="{% url 'doctor_login' %}">
                 {% csrf_token %}
-                <div class="mb-3">
-                    <label class="form-label small fw-semibold">Doctor Name</label>
-                    <input type="text" name="doctor_name" class="form-control" placeholder="Enter Doctor Name" required>
+                <div class="form-floating mb-3">
+                    <input type="text" name="doctor_name" class="form-control" id="id_doctor_name" placeholder="Doctor Name" required>
+                    <label for="id_doctor_name" class="small"><i class="fa-solid fa-user me-2 text-muted"></i>Doctor Name</label>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label small fw-semibold">Department Mapping</label>
-                    <select name="department" class="form-select" required>
+                
+                <div class="form-floating mb-3">
+                    <select name="department" class="form-select" id="id_department" required>
                         {% for code, label in departments %}
                             <option value="{{ code }}">{{ label }}</option>
                         {% endfor %}
                     </select>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label small fw-semibold">Specialization</label>
-                    <input type="text" name="specialization" class="form-control" placeholder="e.g. General Gynecology" required>
-                </div>
-                <div class="mb-4">
-                    <label class="form-label small fw-semibold">Password</label>
-                    <input type="password" name="password" class="form-control" placeholder="Enter Password" required>
+                    <label for="id_department" class="small"><i class="fa-solid fa-building-user me-2 text-muted"></i>Department Mapping</label>
                 </div>
                 
-                <button type="submit" class="btn btn-pink w-100 py-3 mb-3"><i class="bi bi-shield-lock-fill"></i> Login</button>
+                <div class="form-floating mb-3">
+                    <input type="text" name="specialization" class="form-control" id="id_specialization" placeholder="e.g. General Gynecology" required>
+                    <label for="id_specialization" class="small"><i class="fa-solid fa-stethoscope me-2 text-muted"></i>Specialization</label>
+                </div>
+                
+                <div class="form-floating mb-4 position-relative">
+                    <input type="password" name="password" class="form-control" id="id_password" placeholder="Password" required>
+                    <label for="id_password" class="small"><i class="fa-solid fa-lock me-2 text-muted"></i>Password</label>
+                    <button type="button" class="btn btn-link position-absolute end-0 top-50 translate-middle-y text-decoration-none text-muted" onclick="togglePassword('id_password', this)">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
+                
+                <button type="submit" class="btn btn-pink w-100 py-3 mb-3"><i class="fa-solid fa-right-from-bracket me-2"></i> Doctor Login</button>
             </form>
             
-            <div class="text-center mt-3 border-top pt-3" style="border-top-color: var(--border-color) !important;">
-                <p class="small text-muted mb-0">New Doctor? <a href="{% url 'doctor_register' %}" class="fw-semibold text-rose" style="color: var(--primary-pink-dark);">Register Doctor Profile</a></p>
+            <div class="text-center mt-3 border-top pt-3" style="border-top-color: var(--border-glass) !important;">
+                <p class="small text-muted mb-0">New Doctor? <a href="{% url 'doctor_register' %}" class="fw-semibold" style="color: var(--accent-pink);">Register Doctor Profile</a></p>
             </div>
         </div>
     </div>
+    
+    <!-- Right Side: Healthcare Illustration -->
+    <div class="col-lg-6 d-none d-lg-block">
+        <div class="text-center ps-lg-4">
+            <img src="{% static 'images/doctor_login.jpg' %}" alt="Doctor Portal illustration" class="img-fluid rounded-4 shadow-lg border border-light" style="max-height: 480px; object-fit: cover; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.02)';" onmouseout="this.style.transform='scale(1)';">
+            <h4 class="brand-font mt-3">Gynecologist & Obstetrician Workspace</h4>
+            <p class="text-muted small">Access full directory records of patients, worksheets, and prescriptions</p>
+        </div>
+    </div>
 </div>
+
+<script>
+function togglePassword(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const icon = btn.querySelector('i');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+</script>
 {% endblock %}

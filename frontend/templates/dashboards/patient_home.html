@@ -1,16 +1,78 @@
 {% extends 'dashboards/patient_base.html' %}
 
 {% block patient_content %}
-<span class="badge bg-light text-danger border px-3 py-2 mb-2" style="color: var(--primary-pink-dark); border-color: var(--border-color) !important;">Patient Workspace</span>
+<span class="badge bg-light text-danger border px-3 py-2 mb-2" style="color: var(--primary-rose); border-color: var(--border-color) !important;">Patient Workspace</span>
 <h2 class="brand-font mb-2">Welcome to Your Patient Portal</h2>
 <p class="text-muted">Easily request appointments, check symptoms, and track your clinical health history in a clean, comforting environment.</p>
 
-<div class="row mt-4 g-3 text-center">
-    <div class="col-12">
-        <div class="p-4 bg-light rounded-4 border">
-            <h5 class="brand-font mb-2"><i class="bi bi-shield-check text-danger"></i> Smart Symptom Checker & Specialist Search</h5>
-            <p class="small text-muted mb-0">Directly evaluate symptoms, discover matching specialist departments, and request consultations immediately.</p>
-        </div>
+<!-- Notifications Feed -->
+<div class="card card-hospital p-3 mb-4 mt-4">
+    <h5 class="brand-font mb-3 text-rose" style="color: var(--primary-rose);"><i class="bi bi-bell-fill"></i> Alerts & Notifications</h5>
+    <div class="list-group list-group-flush small">
+        {% for note in notifications %}
+            <div class="list-group-item d-flex justify-content-between align-items-center py-2 px-0 border-bottom">
+                <div>
+                    <i class="bi bi-info-circle text-danger me-2"></i>
+                    <span>{{ note.message }}</span>
+                </div>
+                <small class="text-muted">{{ note.created_at|timesince }} ago</small>
+            </div>
+        {% empty %}
+            <p class="text-muted small mb-0 py-2">No active notifications.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- My Doctor Status Section -->
+<div class="card card-hospital p-3 mb-4">
+    <h5 class="brand-font mb-3 text-rose" style="color: var(--primary-rose);"><i class="bi bi-person-badge"></i> My Doctor Status</h5>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle small">
+            <thead>
+                <tr>
+                    <th>Doctor Name</th>
+                    <th>Appointment Status</th>
+                    <th>Doctor Message / Feedback</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for apt in appointments %}
+                <tr>
+                    <td class="fw-bold">Dr. {{ apt.doctor.user.username }}</td>
+                    <td>
+                        {% if apt.status == 'Pending' %}
+                            <span class="badge bg-secondary">Pending</span>
+                        {% elif apt.status == 'Accepted' %}
+                            <span class="badge bg-primary">Approved</span>
+                        {% elif apt.status == 'Rejected' %}
+                            <span class="badge bg-danger">Rejected</span>
+                        {% elif apt.status == 'In Progress' %}
+                            <span class="badge bg-warning text-dark">In Progress</span>
+                        {% elif apt.status == 'Completed' %}
+                            <span class="badge bg-success">Completed</span>
+                        {% else %}
+                            <span class="badge bg-light text-muted">{{ apt.status }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="italic text-muted">{{ apt.doctor_message|default:"Awaiting doctor's observation update." }}</span>
+                    </td>
+                    <td>
+                        {% if apt.status == 'Completed' %}
+                            <a href="{% url 'patient_write_review' apt.id %}" class="btn btn-sm btn-pink py-1 px-2"><i class="bi bi-star"></i> Write a Review</a>
+                        {% else %}
+                            <span class="text-muted small">-</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center py-3 text-muted">No appointments found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 {% endblock %}

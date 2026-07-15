@@ -2,33 +2,72 @@
 {% block title %}Admin Sign In | BloomCare Hospital{% endblock %}
 
 {% block content %}
-<div class="row py-5">
-    <div class="col-md-5 mx-auto">
-        <div class="card card-hospital p-4 p-md-5" style="border-top: 5px solid var(--text-dark);">
+{% load static %}
+<div class="row align-items-center py-5">
+    <!-- Left Side: Login Form -->
+    <div class="col-lg-6 mb-4 mb-lg-0">
+        <div class="card card-hospital p-4 p-md-5 glass-container" style="border-top: 5px solid var(--accent-pink);">
             <div class="text-center mb-4">
-                <span class="fs-2 brand-font"><i class="bi bi-heart-pulse-fill text-danger"></i> BloomCare</span>
-                <h4 class="mt-2 brand-font">Admin Portal Login</h4>
+                <div class="mb-3">
+                    <i class="fa-solid fa-shield-halved fa-3x text-danger" style="color: var(--accent-pink) !important; animation: bounce 2s infinite ease-in-out;"></i>
+                </div>
+                <h3 class="brand-font mb-2"><i class="fa-solid fa-lock me-2"></i> Admin Security Portal</h3>
                 <p class="text-muted small">Access full directory records of patients and specialists</p>
             </div>
             
-            <form method="post" action="{% url 'admin_login' %}">
+            <form method="post" action="{% url 'admin_login' %}" onsubmit="document.getElementById('submitBtn').innerHTML = '<i class=\'fa-solid fa-circle-notch fa-spin\'></i> Authorizing...';">
                 {% csrf_token %}
-                <div class="mb-3">
-                    <label class="form-label small fw-semibold">Admin Username</label>
-                    <input type="text" name="username" class="form-control" placeholder="Enter Admin Username" required>
+                <div class="form-floating mb-3">
+                    <input type="text" name="username" class="form-control" id="id_username" placeholder="Username" required>
+                    <label for="id_username" class="small"><i class="fa-solid fa-user-shield me-2 text-muted"></i>Admin Username</label>
                 </div>
-                <div class="mb-4">
-                    <label class="form-label small fw-semibold">Password</label>
-                    <input type="password" name="password" class="form-control" placeholder="Enter Password" required>
+                <div class="form-floating mb-4 position-relative">
+                    <input type="password" name="password" class="form-control" id="id_password" placeholder="Password" required>
+                    <label for="id_password" class="small"><i class="fa-solid fa-key me-2 text-muted"></i>Password</label>
+                    <button type="button" class="btn btn-link position-absolute end-0 top-50 translate-middle-y text-decoration-none text-muted" onclick="togglePassword('id_password', this)">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
                 </div>
                 
-                <button type="submit" class="btn btn-pink w-100 py-3 mb-3" style="background-color: var(--text-dark); border-color: var(--text-dark);"><i class="bi bi-shield-lock-fill"></i> Login as Admin</button>
+                <button type="submit" id="submitBtn" class="btn btn-pink w-100 py-3 mb-3"><i class="fa-solid fa-shield-halved me-2"></i> Secure Login</button>
             </form>
             
-            <div class="text-center mt-3 border-top pt-3" style="border-top-color: var(--border-color) !important;">
-                <p class="small text-muted mb-0">Are you a patient? <a href="{% url 'patient_login' %}" class="fw-semibold text-rose" style="color: var(--primary-rose);">Access Patient Portal</a></p>
+            <div class="text-center mt-3 border-top pt-3" style="border-top-color: var(--border-glass) !important;">
+                <p class="small text-muted mb-0">Are you a patient? <a href="{% url 'patient_login' %}" class="fw-semibold" style="color: var(--accent-pink);">Access Patient Portal</a></p>
             </div>
         </div>
     </div>
+    
+    <!-- Right Side: Healthcare Illustration -->
+    <div class="col-lg-6 d-none d-lg-block">
+        <div class="text-center ps-lg-4">
+            <img src="{% static 'images/admin_login.jpg' %}" alt="Admin Portal illustration" class="img-fluid rounded-4 shadow-lg border border-light" style="max-height: 480px; object-fit: cover; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.02)';" onmouseout="this.style.transform='scale(1)';">
+            <h4 class="brand-font mt-3">Hospital Administration Console</h4>
+            <p class="text-muted small">Verify doctors registrations, patient appointments, and directory statistics</p>
+        </div>
+    </div>
 </div>
+
+<script>
+function togglePassword(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const icon = btn.querySelector('i');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+</script>
+
+<style>
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+</style>
 {% endblock %}
