@@ -10,7 +10,6 @@ class User(AbstractUser):
         ('PATIENT', 'Patient'),
     )
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='PATIENT')
-
     def is_admin_role(self):
         return self.role == 'ADMIN' or self.is_superuser
 
@@ -128,7 +127,6 @@ class Appointment(models.Model):
     doctor_notes = models.TextField(blank=True, null=True)
     is_case_completed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    
     # New Fields for Doctor Feedback Messages & Admin Approval state
     doctor_message = models.TextField(blank=True, null=True)
     admin_approved = models.CharField(max_length=20, choices=ADMIN_APPROVAL_CHOICES, default='Pending')

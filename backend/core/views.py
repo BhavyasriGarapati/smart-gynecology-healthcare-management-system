@@ -19,6 +19,53 @@ def create_notification(user, message):
 
 # Home Page View
 def home(request):
+    from django.http import JsonResponse
+    
+    # Handle AJAX Feedback Submission
+    if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        if not request.user.is_authenticated or not request.user.is_patient_role():
+            return JsonResponse({'success': False, 'message': 'You must be logged in as a patient to submit feedback.'})
+        
+        # Check overall completed appointments
+        if not Appointment.objects.filter(patient=request.user, status='Completed').exists():
+            return JsonResponse({'success': False, 'message': 'You can submit feedback only after completing a consultation.'})
+            
+        doctor_id = request.POST.get('doctor_id')
+        review_text = request.POST.get('review')
+        rating = request.POST.get('rating')
+        
+        if not doctor_id or not review_text or not rating:
+            return JsonResponse({'success': False, 'message': 'All fields are required.'})
+            
+        try:
+            doctor = DoctorProfile.objects.get(pk=doctor_id)
+        except DoctorProfile.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Selected doctor does not exist.'})
+            
+        # Verify completed appointment with this specific doctor
+        if not Appointment.objects.filter(patient=request.user, doctor=doctor, status='Completed').exists():
+            return JsonResponse({'success': False, 'message': 'You can only review doctors you have actually consulted with.'})
+            
+        # Create review
+        review = Review.objects.create(
+            patient=request.user,
+            doctor=doctor,
+            rating=int(rating),
+            review=review_text
+        )
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Thank you for sharing your valuable feedback.',
+            'review_data': {
+                'patient_name': review.patient.username,
+                'doctor_name': f"Dr. {review.doctor.user.username}",
+                'review': review.review,
+                'rating': review.rating,
+                'date': review.created_at.strftime('%b. %d, %Y')
+            }
+        })
+
     doctors = DoctorProfile.objects.filter(approval_status='Approved')[:6] # display 6 approved doctors
     quotes = [
         "Caring today for a healthier tomorrow.",
@@ -30,12 +77,23 @@ def home(request):
     footer_quote = random.choice(quotes)
     
     # Fetch public reviews: latest first
-    public_reviews = Review.objects.all().order_by('-created_at')[:10]
+    public_reviews = Review.objects.all().order_by('-created_at')
     
+    # Check patient eligibility for feedback
+    can_submit_feedback = False
+    attended_doctors = []
+    if request.user.is_authenticated and request.user.is_patient_role():
+        completed_appointments = Appointment.objects.filter(patient=request.user, status='Completed')
+        if completed_appointments.exists():
+            can_submit_feedback = True
+            attended_doctors = DoctorProfile.objects.filter(appointments__in=completed_appointments).distinct()
+            
     return render(request, 'index.html', {
         'doctors': doctors,
         'footer_quote': footer_quote,
-        'public_reviews': public_reviews
+        'public_reviews': public_reviews,
+        'can_submit_feedback': can_submit_feedback,
+        'attended_doctors': attended_doctors
     })
 
 # Patient Auth Portals

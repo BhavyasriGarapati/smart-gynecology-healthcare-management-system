@@ -1,7 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import User, DoctorProfile, PatientProfile, Appointment, LaboratoryTest, PrescribedMedicine
-
 class CustomUserAdmin(UserAdmin):
     fieldsets = UserAdmin.fieldsets + (
         ('Custom Profile Settings', {'fields': ('role',)}),
