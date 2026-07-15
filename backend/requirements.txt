@@ -1,4 +1,4 @@
-django>=5.0,<6.1
-pillow>=10.0.0
+Django==6.0.6
+Pillow==10.0.0
 gunicorn
 whitenoise
